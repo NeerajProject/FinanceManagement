@@ -14,17 +14,48 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/form-test', function () {
-    return Inertia::render('FormTest');
-})->name('form-test');
+/*
+|--------------------------------------------------------------------------
+| Dev / UI Preview Routes (no auth — for rapid UI iteration)
+|--------------------------------------------------------------------------
+*/
+Route::get('/form-test', fn () => Inertia::render('FormTest'))->name('form-test');
 
-Route::get('/transactions', function () {
-    return Inertia::render('Transactions/Index');
-})->name('transactions');
+/*
+|--------------------------------------------------------------------------
+| Transactions
+|--------------------------------------------------------------------------
+*/
+Route::prefix('transactions')->name('transactions.')->group(function () {
+    Route::get('/',    fn () => Inertia::render('Transactions/Index'))->name('index');
+    Route::get('/{id}', fn ($id) => Inertia::render('Transactions/Show', ['id' => $id]))->name('show');
+});
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+/*
+|--------------------------------------------------------------------------
+| Journal Entries
+|--------------------------------------------------------------------------
+*/
+Route::prefix('journal-entries')->name('journal-entries.')->group(function () {
+    Route::get('/',    fn () => Inertia::render('JournalEntries/Index'))->name('index');
+    Route::get('/{id}', fn ($id) => Inertia::render('JournalEntries/Show', ['id' => $id]))->name('show');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Entry Pipeline (stub — ready for future implementation)
+|--------------------------------------------------------------------------
+*/
+Route::get('/entry-pipeline', fn () => Inertia::render('Transactions/Index'))->name('entry-pipeline');
+
+/*
+|--------------------------------------------------------------------------
+| Dashboard (requires auth)
+|--------------------------------------------------------------------------
+*/
+Route::get('/dashboard', fn () => Inertia::render('Dashboard'))
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
