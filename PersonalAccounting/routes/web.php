@@ -14,6 +14,10 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/form-test', function () {
+    return Inertia::render('FormTest');
+})->name('form-test');
+
 Route::get('/transactions', function () {
     return Inertia::render('Transactions/Index');
 })->name('transactions');

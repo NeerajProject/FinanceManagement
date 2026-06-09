@@ -17,7 +17,7 @@ export default function Sidebar({ activePath = '/transactions' }) {
         { name: 'Transactions', path: '/transactions', icon: Receipt },
         { name: 'Journal Entries', path: '/journal-entries', icon: BookOpen },
         { name: 'Entry Pipeline', path: '/entry-pipeline', icon: GitMerge },
-        { name: 'Settings', path: '/settings', icon: Settings },
+        { name: 'Settings', path: '/profile', icon: Settings },
     ];
 
     const bottomItems = [
