@@ -21,10 +21,20 @@ import {
 // Dashboard menu - passes to AuthenticatedLayout
 const dashboardMenu = [
     { name: 'Dashboard', route: '/dashboard', icon: 'LayoutDashboard' },
-    { name: 'Accounts', route: '/accounts', icon: 'Receipt' },
-    { name: 'Customers', route: '/customers', icon: 'Users' },
-    { name: 'Vendors', route: '/vendors', icon: 'Truck' },
-    { name: 'Reports', route: '/reports', icon: 'FileText' },
+    { name: 'Expense', route: '/accounts', icon: 'Receipt' },
+    { name: 'Income', route: '/customers', icon: 'Users' },
+    { name: 'Payment Transfer', route: '/vendors', icon: 'Truck' },
+    { name: 'Recurrent Payment', route: '/reports', icon: 'FileText' },
+    { name: 'Journal Entry', route: '/reports', icon: 'FileText' },
+    { name: 'Journal', route: '/reports', icon: 'FileText' },
+    { name: 'Chart of Accounts', route: '/reports', icon: 'FileText' },
+    { name: 'Trial Balance', route: '/reports', icon: 'FileText' },
+    { name: 'Balance Sheets', route: '/reports', icon: 'FileText' },
+    { name: 'Profit and Loss Sheets', route: '/reports', icon: 'FileText' },
+    { name: 'General Ledgers', route: '/reports', icon: 'FileText' }
+
+
+
 ];
 
 export default function Dashboard() {
