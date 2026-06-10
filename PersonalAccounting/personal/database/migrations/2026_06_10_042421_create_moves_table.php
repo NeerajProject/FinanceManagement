@@ -12,7 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('moves', function (Blueprint $table) {
-            $table->id();
+                $table->id();
+            $table->foreignId('journal_id');
+            $table->date('date');
+            $table->string('reference');
+            $table->string('state')->default('draft');
             $table->timestamps();
         });
     }

@@ -12,8 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('move_lines', function (Blueprint $table) {
-            $table->id();
+  
+             $table->id();
+
+            $table->foreignId('move_id');
+            $table->foreignId('account_id');
+
+            $table->decimal('debit',16,2)->default(0);
+            $table->decimal('credit',16,2)->default(0);
+
             $table->timestamps();
+  
         });
     }
 
