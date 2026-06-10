@@ -184,20 +184,7 @@ export default function Dashboard() {
 
 
                    <Card title="Metrics">
-                        <div className="space-y-4">
-                            <div>
-                                <p className="text-sm font-medium text-gray-700 mb-2">On-Time Delivery</p>
-                                <ProgressBar label="" value={88} color="indigo" showPercentage={false} />
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium text-gray-700 mb-2">Quality Score</p>
-                                <ProgressBar label="" value={94} color="green" showPercentage={false} />
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium text-gray-700 mb-2">Cost Optimization</p>
-                                <ProgressBar label="" value={71} color="blue" showPercentage={false} />
-                            </div>
-                        </div>
+                      
                     </Card>
                 </div>
 
