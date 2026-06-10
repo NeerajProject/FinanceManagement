@@ -12,41 +12,63 @@ import {
     User,
     Settings,
     HelpCircle,
+    ChevronDown,
 } from 'lucide-react';
+import { getTheme } from '../Config/themes';
 
-export default function AuthenticatedLayout({ children }) {
+// Icon mapping for dynamic icons
+const iconMap = {
+    LayoutDashboard,
+    Users,
+    Receipt,
+    Truck,
+    FileText,
+    Settings,
+    HelpCircle,
+};
+
+export default function AuthenticatedLayout({ children, menu, theme = 'default', pageTitle = 'Dashboard' }) {
     const { auth } = usePage().props;
+    const { menus: propsMenus, url: currentUrl } = usePage().props;
     const user = auth.user;
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    const menus = [
+    // Use passed menu or default
+    const menus = menu || propsMenus || [
         {
             name: 'Dashboard',
             route: '/dashboard',
-            icon: LayoutDashboard,
+            icon: 'LayoutDashboard',
         },
         {
             name: 'Accounts',
             route: '/accounts',
-            icon: Receipt,
+            icon: 'Receipt',
         },
         {
             name: 'Customers',
             route: '/customers',
-            icon: Users,
+            icon: 'Users',
         },
         {
             name: 'Vendors',
             route: '/vendors',
-            icon: Truck,
+            icon: 'Truck',
         },
         {
             name: 'Reports',
             route: '/reports',
-            icon: FileText,
+            icon: 'FileText',
         },
     ];
+
+    const currentTheme = getTheme(theme);
+
+    // Check if a route is active
+    const isActive = (route) => {
+        return currentUrl === route || currentUrl?.startsWith(route);
+    };
 
     return (
         <div className="h-screen flex bg-gray-50 overflow-hidden">
@@ -66,11 +88,13 @@ export default function AuthenticatedLayout({ children }) {
                     inset-y-0 left-0
                     z-50
                     w-64
-                    bg-gradient-to-b from-blue-900 to-blue-800
+                    bg-gradient-to-b from-blue-600 to-blue-800
                     text-white
                     transform
                     transition-transform
                     duration-300
+                    flex
+                    flex-col
                     ${
                         sidebarOpen
                             ? 'translate-x-0'
@@ -78,11 +102,14 @@ export default function AuthenticatedLayout({ children }) {
                     }
                 `}
             >
-                {/* Logo */}
-                <div className="h-16 px-6 flex items-center justify-between border-b border-blue-700">
-                    <h1 className="text-xl font-bold text-white">
-                        LedgerFlow
-                    </h1>
+                {/* Logo Section */}
+                <div className={`h-16 px-6 flex items-center justify-between border-b border-blue-500 border-opacity-30`}>
+                    <div>
+                        <h1 className="text-xl font-bold text-white">
+                            LedgerFlow
+                        </h1>
+                        <p className="text-xs opacity-75">Finance Manager</p>
+                    </div>
 
                     <button
                         className="lg:hidden"
@@ -92,39 +119,115 @@ export default function AuthenticatedLayout({ children }) {
                     </button>
                 </div>
 
-                {/* Menus */}
-                <nav className="p-3">
-                    {menus.map((menu) => {
-                        const Icon = menu.icon;
+                {/* Main Menu - Scrollable */}
+                <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+                    {/* Main Section */}
+                    <div>
+                        <p className="px-4 py-2 text-xs font-semibold opacity-60 uppercase tracking-wider">Main</p>
+                        {menus.map((menu) => {
+                            // Handle both component references and string icon names
+                            const Icon = typeof menu.icon === 'string' ? iconMap[menu.icon] : menu.icon;
+                            const active = isActive(menu.route);
 
-                        return (
-                            <Link
-                                key={menu.name}
-                                href={menu.route}
-                                onClick={() =>
-                                    setSidebarOpen(false)
-                                }
-                                className="
-                                    flex
-                                    items-center
-                                    gap-3
-                                    px-4
-                                    py-3
-                                    rounded-lg
-                                    hover:bg-blue-700
-                                    transition
-                                    mb-1
-                                "
-                            >
-                                <Icon size={20} />
-
-                                <span>
-                                    {menu.name}
-                                </span>
-                            </Link>
-                        );
-                    })}
+                            return (
+                                <Link
+                                    key={menu.name}
+                                    href={menu.route}
+                                    onClick={() =>
+                                        setSidebarOpen(false)
+                                    }
+                                    className={`
+                                        flex
+                                        items-center
+                                        gap-3
+                                        px-4
+                                        py-3
+                                        rounded-lg
+                                        transition
+                                        mb-1
+                                        ${active 
+                                            ? 'bg-white bg-opacity-20 font-semibold' 
+                                            : 'hover:bg-white hover:bg-opacity-10'
+                                        }
+                                    `}
+                                >
+                                    <Icon size={20} className={active ? 'text-white' : 'opacity-75'} />
+                                    <span className={active ? 'text-white' : 'opacity-90'}>
+                                        {menu.name}
+                                    </span>
+                                    {active && (
+                                        <div className="ml-auto w-1 h-6 bg-white rounded-r opacity-100" />
+                                    )}
+                                </Link>
+                            );
+                        })}
+                    </div>
                 </nav>
+
+                {/* Bottom Actions */}
+                <div className={`border-t border-blue-500 border-opacity-30 p-3 space-y-2`}>
+                    {/* User Profile Card */}
+                    <div className="px-4 py-3 rounded-lg bg-white bg-opacity-10 backdrop-blur-sm mb-3">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center flex-shrink-0">
+                                <User size={18} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-sm truncate">
+                                    {user.name}
+                                </p>
+                                <p className="text-xs opacity-75 truncate">
+                                    {user.email}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Settings & Help */}
+                    <Link
+                        href={route('profile.edit')}
+                        onClick={() =>
+                            setSidebarOpen(false)
+                        }
+                        className={`
+                            flex
+                            items-center
+                            gap-3
+                            px-4
+                            py-2
+                            rounded-lg
+                            transition
+                            hover:bg-white
+                            hover:bg-opacity-10
+                        `}
+                    >
+                        <Settings size={18} />
+                        <span className="text-sm">Settings</span>
+                    </Link>
+
+                    {/* Logout */}
+                    <Link
+                        href={route('logout')}
+                        method="post"
+                        as="button"
+                        className={`
+                            w-full
+                            flex
+                            items-center
+                            gap-3
+                            px-4
+                            py-2
+                            rounded-lg
+                            transition
+                            hover:bg-red-500
+                            hover:bg-opacity-30
+                            text-left
+                        `}
+                    >
+                        <LogOut size={18} />
+                        <span className="text-sm">Logout</span>
+                    </Link>
+                </div>
             </aside>
 
             {/* Main Content */}
@@ -132,22 +235,22 @@ export default function AuthenticatedLayout({ children }) {
 
                 {/* Navbar */}
                 <header
-                    className="
+                    className={`
                         h-16
-                        bg-white
-                        border-b
-                        border-gray-200
+                        ${currentTheme.header.bg}
+                        ${currentTheme.header.text}
                         flex
                         items-center
                         justify-between
                         px-4 md:px-6
                         shadow-sm
-                    "
+                        border-b border-opacity-10
+                        border-gray-400
+                    `}
                 >
-                    <div className="flex items-center gap-3">
-
+                    <div className="flex items-center gap-4">
                         <button
-                            className="lg:hidden"
+                            className="lg:hidden p-2 hover:bg-white hover:bg-opacity-10 rounded-lg transition"
                             onClick={() =>
                                 setSidebarOpen(true)
                             }
@@ -155,60 +258,20 @@ export default function AuthenticatedLayout({ children }) {
                             <Menu size={24} />
                         </button>
 
-                        <h2 className="font-semibold text-gray-800">
-                            Dashboard
-                        </h2>
+                        <div>
+                            <h2 className="font-semibold text-lg">
+                                {pageTitle}
+                            </h2>
+                            <p className="text-xs opacity-60">
+                                Manage your finances efficiently
+                            </p>
+                        </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <div className="hidden sm:flex items-center gap-2">
-                            <div
-                                className="
-                                    h-10
-                                    w-10
-                                    rounded-full
-                                    bg-blue-100
-                                    flex
-                                    items-center
-                                    justify-center
-                                    text-blue-600
-                                "
-                            >
-                                <User size={18} />
-                            </div>
-
-                            <div>
-                                <div className="font-medium text-sm">
-                                    {user.name}
-                                </div>
-
-                                <div className="text-xs text-gray-500">
-                                    Administrator
-                                </div>
-                            </div>
-                        </div>
-
-                        <Link
-                            href={route('logout')}
-                            method="post"
-                            as="button"
-                            className="
-                                flex
-                                items-center
-                                gap-2
-                                px-3
-                                py-2
-                                rounded-lg
-                                text-red-600
-                                hover:bg-red-50
-                            "
-                        >
-                            <LogOut size={18} />
-
-                            <span className="hidden sm:block">
-                                Logout
-                            </span>
-                        </Link>
+                    <div className="hidden sm:flex items-center gap-3">
+                        <button className="p-2 hover:bg-white hover:bg-opacity-10 rounded-lg transition">
+                            <HelpCircle size={20} />
+                        </button>
                     </div>
                 </header>
 

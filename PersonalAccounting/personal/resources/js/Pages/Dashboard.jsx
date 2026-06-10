@@ -1,22 +1,40 @@
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import { Ticket, AlertCircle, CheckCircle, Clock } from 'lucide-react';
-import StatCard from '../Components/StatCard';
-import DataTable from '../Components/DataTable';
-import PageHeader from '../Components/PageHeader';
-import FilterTabs from '../Components/FilterTabs';
-import Button from '../Components/Button';
-import { StatsGridResponsive } from '../Components/StatsGrid';
+import { Ticket, AlertCircle, CheckCircle, Clock, TrendingUp, Users, DollarSign } from 'lucide-react';
+import {
+    AnimatedStatCard,
+    DataTable,
+    PageHeader,
+    FilterTabs,
+    Button,
+    StatsGridResponsive,
+    Card,
+    LineChart,
+    BarChart,
+    ChartContainer,
+    ActivityList,
+    ProgressBar,
+    SummaryCard,
+} from '../Components';
+
+// Dashboard menu - passes to AuthenticatedLayout
+const dashboardMenu = [
+    { name: 'Dashboard', route: '/dashboard', icon: 'LayoutDashboard' },
+    { name: 'Accounts', route: '/accounts', icon: 'Receipt' },
+    { name: 'Customers', route: '/customers', icon: 'Users' },
+    { name: 'Vendors', route: '/vendors', icon: 'Truck' },
+    { name: 'Reports', route: '/reports', icon: 'FileText' },
+];
 
 export default function Dashboard() {
     const [activeFilter, setActiveFilter] = useState('all');
 
     const stats = [
-        { title: 'Total Tickets', value: '24', icon: Ticket, color: 'blue' },
-        { title: 'High Priority', value: '3', icon: AlertCircle, color: 'red' },
-        { title: 'In Progress', value: '8', icon: Clock, color: 'orange' },
-        { title: 'Resolved', value: '13', icon: CheckCircle, color: 'green' },
+        { title: 'Total Tickets', value: '24', change: '+12%', changeType: 'increase', icon: Ticket, color: 'blue' },
+        { title: 'High Priority', value: '3', change: '-8%', changeType: 'decrease', icon: AlertCircle, color: 'red' },
+        { title: 'In Progress', value: '8', change: '+5%', changeType: 'increase', icon: Clock, color: 'orange' },
+        { title: 'Resolved', value: '13', change: '+24%', changeType: 'increase', icon: CheckCircle, color: 'green' },
     ];
 
     const allTickets = [
@@ -74,45 +92,165 @@ export default function Dashboard() {
         { key: 'lastUpdate', label: 'LAST UPDATE' },
     ];
 
+    // Chart data
+    const revenueData = [
+        { label: 'Jan', value: 45 },
+        { label: 'Feb', value: 52 },
+        { label: 'Mar', value: 48 },
+        { label: 'Apr', value: 61 },
+        { label: 'May', value: 55 },
+    ];
+
+    const expenseData = [
+        { label: 'Jan', value: 28 },
+        { label: 'Feb', value: 32 },
+        { label: 'Mar', value: 29 },
+        { label: 'Apr', value: 35 },
+        { label: 'May', value: 31 },
+    ];
+
+    const activityItems = [
+        {
+            icon: DollarSign,
+            backgroundColor: 'bg-green-100',
+            iconColor: 'text-green-600',
+            title: 'Invoice #INV-2024-001',
+            description: 'Payment received from Acme Corp',
+            amount: '+$5,450',
+            amountColor: 'text-green-600',
+            amountPrefix: '',
+            badge: { text: 'Completed', className: 'bg-green-100 text-green-800' },
+            timestamp: '2 hours ago',
+        },
+        {
+            icon: AlertCircle,
+            backgroundColor: 'bg-orange-100',
+            iconColor: 'text-orange-600',
+            title: 'Bill #BIL-2024-045',
+            description: 'Payment due to Global Suppliers',
+            amount: '$3,200',
+            amountColor: 'text-orange-600',
+            amountPrefix: '',
+            badge: { text: 'Pending', className: 'bg-orange-100 text-orange-800' },
+            timestamp: '5 hours ago',
+        },
+        {
+            icon: Users,
+            backgroundColor: 'bg-blue-100',
+            iconColor: 'text-blue-600',
+            title: 'New Customer',
+            description: 'Tech Solutions Inc registered',
+            badge: { text: 'New', className: 'bg-blue-100 text-blue-800' },
+            timestamp: '1 day ago',
+        },
+        {
+            icon: TrendingUp,
+            backgroundColor: 'bg-purple-100',
+            iconColor: 'text-purple-600',
+            title: 'Monthly Report',
+            description: 'Revenue report for May 2024',
+            amount: '+12.5%',
+            amountColor: 'text-purple-600',
+            amountPrefix: '',
+            timestamp: '2 days ago',
+        },
+    ];
+
     return (
-        <AuthenticatedLayout>
+        <AuthenticatedLayout
+            menu={dashboardMenu}
+            theme="default"
+            pageTitle="Dashboard"
+        >
             <Head title="Dashboard" />
 
             <div className="space-y-6">
                 {/* Header */}
                 <PageHeader
-                    title="Support Tickets"
-                    description="Manage and track your technical inquiries and account assistance requests."
-                    actions={
-                        <>
-                            <Button variant="primary" size="md">
-                                + Create new Ticket
-                            </Button>
-                        </>
-                    }
+                    title="Dashboard"
+                    description="Welcome back! Here's your financial overview and recent activities."
                 />
 
-                {/* Stats Grid */}
+                {/* Stats Grid with Animations */}
                 <StatsGridResponsive>
                     {stats.map((stat) => (
-                        <StatCard
+                        <AnimatedStatCard
                             key={stat.title}
                             title={stat.title}
                             value={stat.value}
+                            change={stat.change}
+                            changeType={stat.changeType}
                             icon={stat.icon}
                             color={stat.color}
+                            lastUpdated
                         />
                     ))}
                 </StatsGridResponsive>
 
+                {/* Charts Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <ChartContainer
+                        title="Revenue Trend"
+                        subtitle="Last 5 months performance"
+                    >
+                        <LineChart data={revenueData} title="" height={250} />
+                    </ChartContainer>
+
+                    <ChartContainer
+                        title="Expense Breakdown"
+                        subtitle="Cost distribution"
+                    >
+                        <BarChart data={expenseData} title="" height={250} />
+                    </ChartContainer>
+                </div>
+
+                {/* Summary and Activity Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2">
+                        <ActivityList
+                            title="Recent Activities"
+                            items={activityItems}
+                        />
+                    </div>
+
+                    <Card title="Quick Stats">
+                        <div className="space-y-4">
+                            <div>
+                                <div className="flex justify-between mb-2">
+                                    <span className="text-sm font-medium text-gray-700">Ticket Resolution Rate</span>
+                                    <span className="text-sm font-semibold text-gray-900">92%</span>
+                                </div>
+                                <ProgressBar label="" value={92} color="green" showPercentage={false} />
+                            </div>
+                            <div>
+                                <div className="flex justify-between mb-2">
+                                    <span className="text-sm font-medium text-gray-700">Budget Usage</span>
+                                    <span className="text-sm font-semibold text-gray-900">68%</span>
+                                </div>
+                                <ProgressBar label="" value={68} color="blue" showPercentage={false} />
+                            </div>
+                            <div>
+                                <div className="flex justify-between mb-2">
+                                    <span className="text-sm font-medium text-gray-700">Project Completion</span>
+                                    <span className="text-sm font-semibold text-gray-900">45%</span>
+                                </div>
+                                <ProgressBar label="" value={45} color="orange" showPercentage={false} />
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+
                 {/* Filters */}
-                <FilterTabs tabs={filterTabs} activeTab={activeFilter} onTabChange={setActiveFilter} />
+                <div className="pt-2">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Support Tickets</h3>
+                    <FilterTabs tabs={filterTabs} activeTab={activeFilter} onTabChange={setActiveFilter} />
+                </div>
 
                 {/* Data Table */}
                 <DataTable
                     columns={columns}
                     data={filteredTickets}
-                    title="Support Tickets"
+                    title="Recent Tickets"
                     itemsPerPage={10}
                 />
             </div>
