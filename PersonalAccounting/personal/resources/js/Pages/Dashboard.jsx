@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import { Ticket, AlertCircle, CheckCircle, Clock, TrendingUp, Users, DollarSign } from 'lucide-react';
+import { Ticket, AlertCircle, CheckCircle, Clock, TrendingUp, Users, DollarSign,Download } from 'lucide-react';
 import {
     AnimatedStatCard,
     DataTable,
@@ -163,97 +163,47 @@ export default function Dashboard() {
             pageTitle="Dashboard"
         >
             <Head title="Dashboard" />
-
             <div className="space-y-6">
-                {/* Header */}
                 <PageHeader
-                    title="Dashboard"
-                    description="Welcome back! Here's your financial overview and recent activities."
+                    title="Financial Reports"
+                    description="Comprehensive financial analytics and performance metrics."
+                    actions={
+                        <>
+                            <Button variant="primary" size="md">
+                                + Generate Report
+                            </Button>
+                            <Button variant="secondary" size="md">
+                                <Download size={18} />
+                                Export
+                            </Button>
+                        </>
+                    }
                 />
 
-                {/* Stats Grid with Animations */}
-                <StatsGridResponsive>
-                    {stats.map((stat) => (
-                        <AnimatedStatCard
-                            key={stat.title}
-                            title={stat.title}
-                            value={stat.value}
-                            change={stat.change}
-                            changeType={stat.changeType}
-                            icon={stat.icon}
-                            color={stat.color}
-                            lastUpdated
-                        />
-                    ))}
-                </StatsGridResponsive>
 
-                {/* Charts Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <ChartContainer
-                        title="Revenue Trend"
-                        subtitle="Last 5 months performance"
-                    >
-                        <LineChart data={revenueData} title="" height={250} />
-                    </ChartContainer>
 
-                    <ChartContainer
-                        title="Expense Breakdown"
-                        subtitle="Cost distribution"
-                    >
-                        <BarChart data={expenseData} title="" height={250} />
-                    </ChartContainer>
-                </div>
 
-                {/* Summary and Activity Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2">
-                        <ActivityList
-                            title="Recent Activities"
-                            items={activityItems}
-                        />
-                    </div>
-
-                    <Card title="Quick Stats">
+                   <Card title="Metrics">
                         <div className="space-y-4">
                             <div>
-                                <div className="flex justify-between mb-2">
-                                    <span className="text-sm font-medium text-gray-700">Ticket Resolution Rate</span>
-                                    <span className="text-sm font-semibold text-gray-900">92%</span>
-                                </div>
-                                <ProgressBar label="" value={92} color="green" showPercentage={false} />
+                                <p className="text-sm font-medium text-gray-700 mb-2">On-Time Delivery</p>
+                                <ProgressBar label="" value={88} color="indigo" showPercentage={false} />
                             </div>
                             <div>
-                                <div className="flex justify-between mb-2">
-                                    <span className="text-sm font-medium text-gray-700">Budget Usage</span>
-                                    <span className="text-sm font-semibold text-gray-900">68%</span>
-                                </div>
-                                <ProgressBar label="" value={68} color="blue" showPercentage={false} />
+                                <p className="text-sm font-medium text-gray-700 mb-2">Quality Score</p>
+                                <ProgressBar label="" value={94} color="green" showPercentage={false} />
                             </div>
                             <div>
-                                <div className="flex justify-between mb-2">
-                                    <span className="text-sm font-medium text-gray-700">Project Completion</span>
-                                    <span className="text-sm font-semibold text-gray-900">45%</span>
-                                </div>
-                                <ProgressBar label="" value={45} color="orange" showPercentage={false} />
+                                <p className="text-sm font-medium text-gray-700 mb-2">Cost Optimization</p>
+                                <ProgressBar label="" value={71} color="blue" showPercentage={false} />
                             </div>
                         </div>
                     </Card>
                 </div>
 
-                {/* Filters */}
-                <div className="pt-2">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Support Tickets</h3>
-                    <FilterTabs tabs={filterTabs} activeTab={activeFilter} onTabChange={setActiveFilter} />
-                </div>
 
-                {/* Data Table */}
-                <DataTable
-                    columns={columns}
-                    data={filteredTickets}
-                    title="Recent Tickets"
-                    itemsPerPage={10}
-                />
-            </div>
+
+            
         </AuthenticatedLayout>
     );
 }
