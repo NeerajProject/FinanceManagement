@@ -28,8 +28,10 @@ const iconMap = {
 };
 
 export default function AuthenticatedLayout({ children, menu, theme = 'default', pageTitle = 'Dashboard' }) {
-    const { auth } = usePage().props;
-    const { menus: propsMenus, url: currentUrl } = usePage().props;
+    const page = usePage();
+    const { auth } = page.props;
+    const { menus: propsMenus } = page.props;
+    const currentUrl = page.url;
     const user = auth.user;
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -67,7 +69,8 @@ export default function AuthenticatedLayout({ children, menu, theme = 'default',
 
     // Check if a route is active
     const isActive = (route) => {
-        return currentUrl === route || currentUrl?.startsWith(route);
+        if (!currentUrl) return false;
+        return currentUrl === route || currentUrl.startsWith(route);
     };
 
     return (
