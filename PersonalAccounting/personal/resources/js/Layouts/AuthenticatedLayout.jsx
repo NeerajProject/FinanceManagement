@@ -2,109 +2,62 @@ import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import {
     LayoutDashboard,
-    Users,
-    Receipt,
-    Truck,
-    FileText,
     Menu,
     X,
     LogOut,
     User,
     Settings,
     HelpCircle,
-    ChevronDown,
 } from 'lucide-react';
-import { getTheme } from '../Config/themes';
 
-// Icon mapping for dynamic icons
-const iconMap = {
-    LayoutDashboard,
-    Users,
-    Receipt,
-    Truck,
-    FileText,
-    Settings,
-    HelpCircle,
-};
-
-export default function AuthenticatedLayout({ children, menu, theme = 'default', pageTitle = 'Dashboard' }) {
-    const page = usePage();
-    const { auth } = page.props;
-    const { menus: propsMenus } = page.props;
-    const currentUrl = page.url;
-    const user = auth.user;
+export default function AuthenticatedLayout({
+    children,
+    menu = [],
+    pageTitle = 'Dashboard',
+}) {
+    const { props, url } = usePage();
+    const { auth, menus: pageMenus } = props;
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    // Use passed menu or default
-    const menus = menu || propsMenus ||[
-    { name: 'Dashboard', route: '/dashboard', icon: 'Receipt' },
+    const menus = menu.length
+        ? menu
+        : pageMenus || [
+              { name: 'Dashboard', route: '/dashboard' },
+              { name: 'Expense', route: '/expenses' },
+              { name: 'Income', route: '/income' },
+              { name: 'Payment Transfer', route: '/payment-transfer' },
+              { name: 'Recurring Transactions', route: '/recurring-transactions' },
+              { name: 'Journal Entry', route: '/journal-entry' },
+              { name: 'Chart of Accounts', route: '/chart-of-accounts' },
+              { name: 'Journal', route: '/journal' },
+              { name: 'Report', route: '/report-accounting' },
 
-    { name: 'Expense', route: '/expenses', icon: 'Receipt' },
-    { name: 'Income', route: '/income', icon: 'Receipt' },
 
-    { name: 'Payment Transfer', route: '/payment-transfer', icon: 'Receipt' },
-    { name: 'Recurrent Payment', route: '/recurrent-payment', icon: 'Receipt' },
+            
 
-    { name: 'Journal Entry', route: '/journal-entry', icon: 'Receipt' },
-    { name: 'Journal', route: '/journal', icon: 'Receipt' },
+          ];
 
-    { name: 'Chart of Accounts', route: '/chart-of-accounts', icon: 'Receipt' },
-
-    { name: 'Trial Balance', route: '/trial-balance', icon: 'Receipt' },
-    { name: 'Balance Sheets', route: '/balance-sheet', icon: 'Receipt' },
-    { name: 'Profit and Loss Sheets', route: '/profit-loss', icon: 'Receipt' },
-
-    { name: 'General Ledgers', route: '/general-ledger', icon: 'Receipt' },
-];
-
-    const currentTheme = getTheme(theme);
-
-    // Check if a route is active
-    const isActive = (route) => {
-        if (!currentUrl) return false;
-        return currentUrl === route || currentUrl.startsWith(route);
-    };
+    const isActive = (route) => url.startsWith(route);
 
     return (
-        <div className="h-screen flex bg-gray-50 overflow-hidden">
-
-            {/* Mobile Overlay */}
-            {sidebarOpen && (
-                <div
-                    className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-                    onClick={() => setSidebarOpen(false)}
-                />
-            )}
-
+        <div className="flex h-screen bg-gray-50">
             {/* Sidebar */}
             <aside
-                className={`
-                    fixed lg:static
-                    inset-y-0 left-0
-                    z-50
-                    w-64
-                    bg-gradient-to-b from-blue-600 to-blue-800
-                    text-white
-                    transform
-                    transition-transform
-                    duration-300
-                    flex
-                    flex-col
-                    ${
-                        sidebarOpen
-                            ? 'translate-x-0'
-                            : '-translate-x-full lg:translate-x-0'
-                    }
-                `}
+                className={`fixed lg:static w-64 bg-blue-700 text-white flex flex-col transition-transform
+                ${
+                    sidebarOpen
+                        ? 'translate-x-0'
+                        : '-translate-x-full lg:translate-x-0'
+                }`}
             >
-                {/* Logo Section */}
-                <div className={`h-16 px-6 flex items-center justify-between border-b border-blue-500 border-opacity-30`}>
+                {/* Logo */}
+                <div className="h-16 px-6 flex items-center justify-between border-b border-blue-600">
                     <div>
-                        <h1 className="text-xl font-bold text-white">
-                            LedgerFlow
-                        </h1>
-                        <p className="text-xs opacity-75">Finance Manager</p>
+                        <h1 className="font-bold">LedgerFlow</h1>
+                        <p className="text-xs opacity-75">
+                            Finance Manager
+                        </p>
                     </div>
 
                     <button
@@ -115,164 +68,75 @@ export default function AuthenticatedLayout({ children, menu, theme = 'default',
                     </button>
                 </div>
 
-                {/* Main Menu - Scrollable */}
-                <nav className="flex-1 overflow-y-auto p-3 space-y-1">
-                    {/* Main Section */}
-                    <div>
-                        <p className="px-4 py-2 text-xs font-semibold opacity-60 uppercase tracking-wider">Main</p>
-                        {menus.map((menu) => {
-                            // Handle both component references and string icon names
-                            const Icon = typeof menu.icon === 'string' ? iconMap[menu.icon] : menu.icon;
-                            const active = isActive(menu.route);
-
-                            return (
-                                <Link
-                                    key={menu.name}
-                                    href={menu.route}
-                                    onClick={() =>
-                                        setSidebarOpen(false)
-                                    }
-                                    className={`
-                                        flex
-                                        items-center
-                                        gap-3
-                                        px-4
-                                        py-3
-                                        rounded-lg
-                                        transition
-                                        mb-1
-                                        ${active 
-                                            ? 'bg-white bg-opacity-20 font-semibold' 
-                                            : 'hover:bg-white hover:bg-opacity-10'
-                                        }
-                                    `}
-                                >
-                                    <Icon size={20} className={active ? 'text-white' : 'opacity-75'} />
-                                    <span className={active ? 'text-white' : 'opacity-90'}>
-                                        {menu.name}
-                                    </span>
-                                    {active && (
-                                        <div className="ml-auto w-1 h-6 bg-white rounded-r opacity-100" />
-                                    )}
-                                </Link>
-                            );
-                        })}
-                    </div>
+                {/* Menu */}
+                <nav className="flex-1 p-3">
+                    {menus.map((item) => (
+                        <Link
+                            key={item.route}
+                            href={item.route}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-lg mb-1
+                            ${
+                                isActive(item.route)
+                                    ? 'bg-white/20'
+                                    : 'hover:bg-white/10'
+                            }`}
+                        >
+                            <LayoutDashboard size={18} />
+                            {item.name}
+                        </Link>
+                    ))}
                 </nav>
 
-                {/* Bottom Actions */}
-                <div className={`border-t border-blue-500 border-opacity-30 p-3 space-y-2`}>
-                    {/* User Profile Card */}
-                    <div className="px-4 py-3 rounded-lg bg-white bg-opacity-10 backdrop-blur-sm mb-3">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center flex-shrink-0">
-                                <User size={18} />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-sm truncate">
-                                    {user.name}
-                                </p>
-                                <p className="text-xs opacity-75 truncate">
-                                    {user.email}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Settings & Help */}
-                    <Link
-                        href={route('profile.edit')}
-                        onClick={() =>
-                            setSidebarOpen(false)
-                        }
-                        className={`
-                            flex
-                            items-center
-                            gap-3
-                            px-4
-                            py-2
-                            rounded-lg
-                            transition
-                            hover:bg-white
-                            hover:bg-opacity-10
-                        `}
-                    >
-                        <Settings size={18} />
-                        <span className="text-sm">Settings</span>
-                    </Link>
-
-                    {/* Logout */}
-                    <Link
-                        href={route('logout')}
-                        method="post"
-                        as="button"
-                        className={`
-                            w-full
-                            flex
-                            items-center
-                            gap-3
-                            px-4
-                            py-2
-                            rounded-lg
-                            transition
-                            hover:bg-red-500
-                            hover:bg-opacity-30
-                            text-left
-                        `}
-                    >
-                        <LogOut size={18} />
-                        <span className="text-sm">Logout</span>
-                    </Link>
-                </div>
-            </aside>
-
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col min-w-0">
-
-                {/* Navbar */}
-                <header
-                    className={`
-                        h-16
-                        ${currentTheme.header.bg}
-                        ${currentTheme.header.text}
-                        flex
-                        items-center
-                        justify-between
-                        px-4 md:px-6
-                        shadow-sm
-                        border-b border-opacity-10
-                        border-gray-400
-                    `}
-                >
-                    <div className="flex items-center gap-4">
-                        <button
-                            className="lg:hidden p-2 hover:bg-white hover:bg-opacity-10 rounded-lg transition"
-                            onClick={() =>
-                                setSidebarOpen(true)
-                            }
-                        >
-                            <Menu size={24} />
-                        </button>
-
+                {/* User */}
+                <div className="p-3 border-t border-blue-600">
+                    <div className="flex items-center gap-3 mb-3">
+                        <User size={18} />
                         <div>
-                            <h2 className="font-semibold text-lg">
-                                {pageTitle}
-                            </h2>
-                            <p className="text-xs opacity-60">
-                                Manage your finances efficiently
+                            <p>{auth.user.name}</p>
+                            <p className="text-xs opacity-70">
+                                {auth.user.email}
                             </p>
                         </div>
                     </div>
 
-                    <div className="hidden sm:flex items-center gap-3">
-                        <button className="p-2 hover:bg-white hover:bg-opacity-10 rounded-lg transition">
-                            <HelpCircle size={20} />
+                    <Link
+                        href={route('profile.edit')}
+                        className="flex items-center gap-2 py-2"
+                    >
+                        <Settings size={16} />
+                        Settings
+                    </Link>
+
+                    <Link
+                        href={route('logout')}
+                        method="post"
+                        as="button"
+                        className="flex items-center gap-2 py-2 w-full text-left"
+                    >
+                        <LogOut size={16} />
+                        Logout
+                    </Link>
+                </div>
+            </aside>
+
+            {/* Content */}
+            <div className="flex-1 flex flex-col">
+                <header className="h-16 flex items-center justify-between px-6 border-b bg-white">
+                    <div className="flex items-center gap-3">
+                        <button
+                            className="lg:hidden"
+                            onClick={() => setSidebarOpen(true)}
+                        >
+                            <Menu size={22} />
                         </button>
+
+                        <h2 className="font-semibold">{pageTitle}</h2>
                     </div>
+
+                    <HelpCircle size={20} />
                 </header>
 
-                {/* Page Content */}
-                <main className="flex-1 overflow-y-auto p-4 md:p-6">
+                <main className="flex-1 overflow-y-auto p-6">
                     {children}
                 </main>
             </div>
