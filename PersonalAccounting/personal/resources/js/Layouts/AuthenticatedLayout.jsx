@@ -37,33 +37,26 @@ export default function AuthenticatedLayout({ children, menu, theme = 'default',
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     // Use passed menu or default
-    const menus = menu || propsMenus || [
-        {
-            name: 'Dashboard',
-            route: '/dashboard',
-            icon: 'LayoutDashboard',
-        },
-        {
-            name: 'Accounts',
-            route: '/accounts',
-            icon: 'Receipt',
-        },
-        {
-            name: 'Customers',
-            route: '/customers',
-            icon: 'Users',
-        },
-        {
-            name: 'Vendors',
-            route: '/vendors',
-            icon: 'Truck',
-        },
-        {
-            name: 'Reports',
-            route: '/reports',
-            icon: 'FileText',
-        },
-    ];
+    const menus = menu || propsMenus ||[
+    { name: 'Dashboard', route: '/dashboard', icon: 'Receipt' },
+
+    { name: 'Expense', route: '/expenses', icon: 'Receipt' },
+    { name: 'Income', route: '/income', icon: 'Receipt' },
+
+    { name: 'Payment Transfer', route: '/payment-transfer', icon: 'Receipt' },
+    { name: 'Recurrent Payment', route: '/recurrent-payment', icon: 'Receipt' },
+
+    { name: 'Journal Entry', route: '/journal-entry', icon: 'Receipt' },
+    { name: 'Journal', route: '/journal', icon: 'Receipt' },
+
+    { name: 'Chart of Accounts', route: '/chart-of-accounts', icon: 'Receipt' },
+
+    { name: 'Trial Balance', route: '/trial-balance', icon: 'Receipt' },
+    { name: 'Balance Sheets', route: '/balance-sheet', icon: 'Receipt' },
+    { name: 'Profit and Loss Sheets', route: '/profit-loss', icon: 'Receipt' },
+
+    { name: 'General Ledgers', route: '/general-ledger', icon: 'Receipt' },
+];
 
     const currentTheme = getTheme(theme);
 
