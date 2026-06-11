@@ -4,21 +4,46 @@ import DataTable from '@/Components/DataTable';
 
 export default function Index({ accounts }) {
 
-    const columns = [
+  const columns = [
+    {   label:"Code",
+        header: 'Code',
+        accessor: 'code',
+    },
+    {   label:"Name",
+        header: 'Name',
+        accessor: 'name',
+    },
+    {   label:"Account Type",
+        header: 'Type',
+        accessor: 'account_type',
+        options: {
+            asset_receivable: 'Receivable',
+            asset_cash: 'Cash',
+            asset_current: 'Current Asset',
+            asset_non_current: 'Non Current Asset',
+            asset_prepayments: 'Prepayments',
+            asset_fixed: 'Fixed Asset',
 
-        {
-            header: 'Code',
-            accessor: 'code',
+            liability_payable: 'Payable',
+            liability_credit_card: 'Credit Card',
+            liability_current: 'Current Liability',
+            liability_non_current: 'Non Current Liability',
+
+            equity: 'Equity',
+            equity_unaffected: 'Current Year Earnings',
+
+            income: 'Income',
+            income_other: 'Other Income',
+
+            expense: 'Expense',
+            expense_other: 'Other Expense',
+            expense_depreciation: 'Depreciation',
+            expense_direct_cost: 'Direct Cost',
+
+            off_balance: 'Off Balance',
         },
-        {
-            header: 'Name',
-            accessor: 'name',
-        },
-        {
-            header: 'Type',
-            accessor: 'account_type'
-        },
-    ];
+    },
+];
     console.log('Accounts data:', accounts);
 
     return (
