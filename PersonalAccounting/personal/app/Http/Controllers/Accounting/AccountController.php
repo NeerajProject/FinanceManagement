@@ -9,6 +9,7 @@ use App\Services\AccountService;
 use App\Http\Requests\StoreAccountRequest;
 use App\Http\Requests\UpdateAccountRequest;
 use App\Repositories\Interfaces\AccountRepositoryInterface;
+use Illuminate\Http\Request;
 
 class AccountController extends Controller
 {
@@ -17,17 +18,37 @@ class AccountController extends Controller
         protected AccountService $service
     ) {}
 
-    public function index()
-    {
+   public function index(
+        Request $request
+    ) {
+
+        $accounts =
+            $this->repository->paginate(
+                filters: $request->all(),
+                perPage: $request->integer(
+                    'per_page',
+                    15
+                )
+            );
+
         return Inertia::render(
             'Accounts/Index',
             [
-                'accounts' =>
-                    $this->repository->paginate(),
+                'accounts' => $accounts,
+
+                'filters' => [
+                    'search' =>
+                        $request->search,
+
+                    'condition' =>
+                        $request->condition,
+
+                    'rules' =>
+                        $request->filters,
+                ],
             ]
         );
     }
-
     public function create()
     {
         return Inertia::render(

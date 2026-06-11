@@ -49,19 +49,6 @@ export default function Index({ accounts }) {
 ];
     console.log('Accounts data:', accounts);
 
-    const handleFilter = (rules) => {
-
-        router.get(
-            route('accounts.index'),
-            {
-                filters: rules,
-            },
-            {
-                preserveState: true,
-                replace: true,
-            }
-        );
-    };
 
     return (
         <AuthenticatedLayout pageTitle="Chart of  Accounts">
@@ -115,16 +102,18 @@ export default function Index({ accounts }) {
             type: 'date',
         },
     ]}
-    onSearch={(payload) => {
-        console.log('Search payload:', payload);
+      onSearch={(payload) => {
+
         router.get(
-            route('accounts.index'),
+           '/accounts',
             payload,
             {
                 preserveState: true,
                 replace: true,
             }
         );
+
+
     }}
 />
 

@@ -8,19 +8,27 @@ use Illuminate\Database\Eloquent\Collection;
 
 interface AccountRepositoryInterface
 {
-    public function paginate(int $perPage = 15): LengthAwarePaginator;
+    public function paginate(
+        array $filters = [],
+        int $perPage = 15
+    ): LengthAwarePaginator;
 
     public function all(): Collection;
 
-    public function find(int $id): ?Account;
+    public function find(
+        int $id
+    ): ?Account;
 
-    public function create(array $data): Account;
+    public function create(
+        array $data
+    ): Account;
 
-    public function update(Account $account, array $data): Account;
+    public function update(
+        Account $account,
+        array $data
+    ): Account;
 
-    public function delete(Account $account): bool;
-
-    public function getActive(): Collection;
-
-    public function getParents(): Collection;
+    public function delete(
+        Account $account
+    ): bool;
 }

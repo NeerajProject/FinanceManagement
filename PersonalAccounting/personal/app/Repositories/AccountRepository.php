@@ -9,14 +9,196 @@ use Illuminate\Database\Eloquent\Collection;
 
 class AccountRepository implements AccountRepositoryInterface
 {
-    public function paginate(
+
+
+      public function paginate(
+        array $filters = [],
         int $perPage = 15
     ): LengthAwarePaginator {
-        return Account::query()->latest()
-            ->paginate($perPage);
+
+        $query = Account::query();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Search
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($filters['search'])) {
+
+            $search = trim(
+                $filters['search']
+            );
+
+            $query->where(
+                function ($q) use ($search) {
+
+                    $q->where(
+                        'code',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhere(
+                        'name',
+                        'like',
+                        "%{$search}%"
+                    );
+                }
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Advanced Filters
+        |--------------------------------------------------------------------------
+        */
+
+        $condition =
+            $filters['condition']
+            ?? 'and';
+
+        foreach (
+            $filters['filters']
+            ?? []
+            as $filter
+        ) {
+
+            if (
+                empty(
+                    $filter['field']
+                )
+            ) {
+                continue;
+            }
+
+            $field =
+                $filter['field'];
+
+            $operator =
+                $filter['operator']
+                ?? '=';
+
+            $value =
+                $filter['value']
+                ?? null;
+
+            $method =
+                $condition === 'or'
+                    ? 'orWhere'
+                    : 'where';
+
+            switch ($operator) {
+
+                case '=':
+
+                    $query->{$method}(
+                        $field,
+                        '=',
+                        $value
+                    );
+
+                    break;
+
+                case '!=':
+
+                    $query->{$method}(
+                        $field,
+                        '!=',
+                        $value
+                    );
+
+                    break;
+
+                case 'contains':
+
+                    $query->{$method}(
+                        $field,
+                        'like',
+                        "%{$value}%"
+                    );
+
+                    break;
+
+                case 'starts_with':
+
+                    $query->{$method}(
+                        $field,
+                        'like',
+                        "{$value}%"
+                    );
+
+                    break;
+
+                case 'ends_with':
+
+                    $query->{$method}(
+                        $field,
+                        'like',
+                        "%{$value}"
+                    );
+
+                    break;
+
+                case '>':
+
+                    $query->{$method}(
+                        $field,
+                        '>',
+                        $value
+                    );
+
+                    break;
+
+                case '<':
+
+                    $query->{$method}(
+                        $field,
+                        '<',
+                        $value
+                    );
+
+                    break;
+
+                case 'between':
+
+                    if (
+                        !empty(
+                            $filter[
+                                'value_to'
+                            ]
+                        )
+                    ) {
+
+                        $query->whereBetween(
+                            $field,
+                            [
+                                $value,
+                                $filter[
+                                    'value_to'
+                                ],
+                            ]
+                        );
+                    }
+
+                    break;
+            }
+        }
+
+        return $query
+            ->latest()
+            ->paginate($perPage)
+            ->withQueryString();
     }
 
-    public function all(): Collection
+
+
+
+
+
+
+
+
+public function all(): Collection
     {
         return Account::all();
     }
@@ -32,9 +214,12 @@ class AccountRepository implements AccountRepositoryInterface
     }
 
     public function update(
+        
         Account $account,
         array $data
     ): Account {
+                dd('paginate method called with perPage: ' . $perPage);
+
         $account->update($data);
 
         return $account->refresh();
