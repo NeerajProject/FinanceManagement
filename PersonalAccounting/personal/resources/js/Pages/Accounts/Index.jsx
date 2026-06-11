@@ -3,7 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import DataTable from '@/Components/DataTable';
 import SearchFilter from '@/Components/FilterBuilder';
 import Card from '@/Components/Card';
-
+import { router } from '@inertiajs/react';
 
 export default function Index({ accounts }) {
 
@@ -105,7 +105,7 @@ export default function Index({ accounts }) {
       onSearch={(payload) => {
 
         router.get(
-           '/accounts',
+           'accounts.index',
             payload,
             {
                 preserveState: true,
