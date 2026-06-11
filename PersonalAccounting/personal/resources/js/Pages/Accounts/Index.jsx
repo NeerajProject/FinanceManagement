@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import DataTable from '@/Components/DataTable';
+import FilterBuilder from '@/Components/FilterBuilder';
 
 export default function Index({ accounts }) {
 
@@ -46,6 +47,20 @@ export default function Index({ accounts }) {
 ];
     console.log('Accounts data:', accounts);
 
+    const handleFilter = (rules) => {
+
+        router.get(
+            route('accounts.index'),
+            {
+                filters: rules,
+            },
+            {
+                preserveState: true,
+                replace: true,
+            }
+        );
+    };
+
     return (
         <AuthenticatedLayout>
             <Head title="Accounts" />
@@ -65,7 +80,15 @@ export default function Index({ accounts }) {
                         Create
                     </Link>
                 </div>
-
+                  <FilterBuilder
+                    fields={[
+                        { value: 'id', label: 'ID', type: 'number' },
+                        { value: 'name', label: 'Name', type: 'text' },
+                        { value: 'email', label: 'Email', type: 'text' },
+                        { value: 'status', label: 'Status', type: 'select' },
+                    ]}
+                    onSearch={handleFilter}
+                />
                 {/* TABLE */}
                 <DataTable
                     title="Accounts"
