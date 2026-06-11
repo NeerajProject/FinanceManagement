@@ -1,6 +1,6 @@
 export default function Card({ children, title, subtitle, header, className = '' }) {
     return (
-        <div className={`bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden ${className}`}>
+        <div className={`bg-white rounded-lg shadow-sm border p-2 border-gray-100 overflow-hidden ${className}`}>
             {(title || header) && (
                 <div className="px-6 py-4 border-b border-gray-100">
                     {header ? (

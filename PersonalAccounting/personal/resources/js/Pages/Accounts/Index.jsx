@@ -2,6 +2,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import DataTable from '@/Components/DataTable';
 import SearchFilter from '@/Components/FilterBuilder';
+import Card from '@/Components/Card';
+
 
 export default function Index({ accounts }) {
 
@@ -62,7 +64,7 @@ export default function Index({ accounts }) {
     };
 
     return (
-        <AuthenticatedLayout>
+        <AuthenticatedLayout pageTitle="Chart of  Accounts">
             <Head title="Accounts" />
 
         <SearchFilter
@@ -126,7 +128,9 @@ export default function Index({ accounts }) {
     }}
 />
 
-            <div className="p-6 space-y-4">
+
+<Card>
+                <div className="p-6 space-y-4">
 
                 {/* HEADER */}
                 <div className="flex justify-between items-center">
@@ -147,12 +151,13 @@ export default function Index({ accounts }) {
                     title="Accounts"
                     columns={columns}
                     data={accounts.data}
-                    itemsPerPage={10}
+                    itemsPerPage={5}
                     onEdit={(row) => `/accounts/${row.id}/edit`}
                     onDelete={(row) => `/accounts/${row.id}`}
                 />
 
             </div>
+        </Card>
         </AuthenticatedLayout>
     );
 }
