@@ -1,53 +1,137 @@
+import { Link, router } from '@inertiajs/react';
+import {
+    Pencil,
+    Trash2,
+} from 'lucide-react';
+
 export default function TableRow({
     columns = [],
     data = {},
-    master,
     onEdit,
     onDelete,
 }) {
+    const handleDelete = () => {
+
+        if (
+            confirm(
+                'Are you sure you want to delete this record?'
+            )
+        ) {
+
+            router.delete(
+                onDelete(data),
+                {
+                    preserveScroll: true,
+                }
+            );
+
+        }
+    };
 
     return (
-        <tr className="border-b border-gray-100 hover:bg-gray-50 transition">
+        <tr className="
+            border-b
+            border-gray-100
+            hover:bg-gray-50
+            transition-colors
+        ">
 
-            {/* DATA COLUMNS */}
+            {/* Data Columns */}
+
             {columns.map((col) => {
-                const value = col.accessor ? data[col.accessor] : null;
+
+                const value =
+                    data[col.accessor];
 
                 return (
                     <td
                         key={`${data.id}-${col.accessor}`}
-                        className="px-4 py-3 text-sm text-gray-900"
+                        className="
+                            px-4
+                            py-3
+                            text-sm
+                            text-gray-700
+                            whitespace-nowrap
+                        "
                     >
                         {col.options
-                            ? col.options[value] || value || '-'
-                            : value || '-'}
+                            ? col.options[value] ??
+                              value ??
+                              '-'
+                            : value ?? '-'}
                     </td>
                 );
             })}
 
-            {/* ACTIONS COLUMN */}
+            {/* Actions */}
+
             {(onEdit || onDelete) && (
-                <td className="px-4 py-3 text-sm flex gap-3">
 
-                    {onEdit && (
-                        <a
-                            href={onEdit(data)}
-                            className="text-blue-600 hover:underline"
-                        >
-                            Edit
-                        </a>
-                    )}
+                <td className="px-4 py-3">
 
-                    {onDelete && (
-                        <a
-                            href={onDelete(data)}
-                            className="text-red-600 hover:underline"
-                        >
-                            Delete
-                        </a>
-                    )}
+                    <div className="flex items-center gap-3">
+
+                        {onEdit && (
+
+                            <Link
+                                href={onEdit(
+                                    data
+                                )}
+                                className="
+                                    inline-flex
+                                    items-center
+                                    gap-1
+                                    text-blue-600
+                                    hover:text-blue-800
+                                "
+                            >
+                                <Pencil
+                                    size={
+                                        16
+                                    }
+                                />
+
+                                <span>
+                                    Edit
+                                </span>
+
+                            </Link>
+
+                        )}
+
+                        {onDelete && (
+
+                            <button
+                                type="button"
+                                onClick={
+                                    handleDelete
+                                }
+                                className="
+                                    inline-flex
+                                    items-center
+                                    gap-1
+                                    text-red-600
+                                    hover:text-red-800
+                                "
+                            >
+                                <Trash2
+                                    size={
+                                        16
+                                    }
+                                />
+
+                                <span>
+                                    Delete
+                                </span>
+
+                            </button>
+
+                        )}
+
+                    </div>
 
                 </td>
+
             )}
 
         </tr>
