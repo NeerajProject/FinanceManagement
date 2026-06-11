@@ -39,12 +39,12 @@ export default function TableRow({
                     )}
 
                     {onDelete && (
-                        <button
-                            onClick={() => onDelete(data)}
+                        <a
+                            href={onDelete(data)}
                             className="text-red-600 hover:underline"
                         >
                             Delete
-                        </button>
+                        </a>
                     )}
 
                 </td>

@@ -20,7 +20,7 @@ export default function DataTable({
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const paginatedData = data.slice(startIndex, endIndex);
-
+    
     return (
         <Card title={title}>
           
