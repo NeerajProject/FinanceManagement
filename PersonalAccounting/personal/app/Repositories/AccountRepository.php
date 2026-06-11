@@ -12,9 +12,7 @@ class AccountRepository implements AccountRepositoryInterface
     public function paginate(
         int $perPage = 15
     ): LengthAwarePaginator {
-        return Account::query()
-            ->with('parent')
-            ->latest()
+        return Account::query()->latest()
             ->paginate($perPage);
     }
 

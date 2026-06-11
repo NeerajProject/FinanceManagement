@@ -4,7 +4,7 @@ import TableRow from './TableRow';
 import Pagination from './Pagination';
 import Card from './Card';
 
-export default function DataTable({ columns, data, title, itemsPerPage = 10 }) {
+export default function DataTable({ columns, data, title, itemsPerPage = 10 ,master}) {
     const [currentPage, setCurrentPage] = useState(1);
 
     const totalPages = Math.ceil(data.length / itemsPerPage);
@@ -20,7 +20,7 @@ export default function DataTable({ columns, data, title, itemsPerPage = 10 }) {
                         <TableHeader columns={columns} />
                         <tbody>
                             {paginatedData.map((row) => (
-                                <TableRow key={row.id} columns={columns} data={row} />
+                                <TableRow key={row.id}   columns={columns} data={row} />
                             ))}
                         </tbody>
                     </table>

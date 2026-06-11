@@ -1,77 +1,55 @@
-import AuthenticatedLayout
-from '@/Layouts/AuthenticatedLayout';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head, Link } from '@inertiajs/react';
+import DataTable from '@/Components/DataTable';
 
-import { Head, Link }
-from '@inertiajs/react';
+export default function Index({ accounts }) {
 
-export default function Index({
-    accounts
-}) {
+    const columns = [
+
+        {
+            header: 'Code',
+            accessor: 'code',
+        },
+        {
+            header: 'Name',
+            accessor: 'name',
+        },
+        {
+            header: 'Type',
+            accessor: 'account_type'
+        },
+    ];
+    console.log('Accounts data:', accounts);
+
     return (
         <AuthenticatedLayout>
-
             <Head title="Accounts" />
 
-            <div className="p-6">
+            <div className="p-6 space-y-4">
 
-                <div className="flex justify-between">
-
+                {/* HEADER */}
+                <div className="flex justify-between items-center">
                     <h1 className="text-2xl font-bold">
-                        Chart Of Accounts
+                        Chart of Accounts
                     </h1>
 
                     <Link
                         href={route('accounts.create')}
-                        className="btn btn-primary"
+                        className="bg-blue-600 text-white px-4 py-2 rounded"
                     >
                         Create
                     </Link>
-
                 </div>
 
-                <table className="w-full mt-5">
-
-                    <thead>
-                        <tr>
-                            <th>Code</th>
-                            <th>Name</th>
-                            <th>Type</th>
-                            <th>Parent</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        {accounts.data.map(
-                            account => (
-                                <tr key={account.id}>
-                                    <td>
-                                        {account.code}
-                                    </td>
-
-                                    <td>
-                                        {account.name}
-                                    </td>
-
-                                    <td>
-                                        {account.account_type}
-                                    </td>
-
-                                    <td>
-                                        {
-                                            account.parent?.name
-                                        }
-                                    </td>
-                                </tr>
-                            )
-                        )}
-
-                    </tbody>
-
-                </table>
+                {/* TABLE */}
+                <DataTable
+                    title="Accounts"
+                    columns={columns}
+                    data={accounts.data}
+                    itemsPerPage={10}
+                />
 
             </div>
-
         </AuthenticatedLayout>
     );
 }
