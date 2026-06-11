@@ -1,15 +1,22 @@
-export default function TableRow({ columns = [], data = {} }) {
+export default function TableRow({
+    columns = [],
+    data = {},
+    master,
+    onEdit,
+    onDelete,
+}) {
 
     return (
         <tr className="border-b border-gray-100 hover:bg-gray-50 transition">
 
+            {/* DATA COLUMNS */}
             {columns.map((col) => {
                 const value = col.accessor ? data[col.accessor] : null;
 
                 return (
                     <td
                         key={`${data.id}-${col.accessor}`}
-                        className="px-4 md:px-6 py-4 text-sm text-gray-900"
+                        className="px-4 py-3 text-sm text-gray-900"
                     >
                         {col.options
                             ? col.options[value] || value || '-'
@@ -17,6 +24,31 @@ export default function TableRow({ columns = [], data = {} }) {
                     </td>
                 );
             })}
+
+            {/* ACTIONS COLUMN */}
+            {(onEdit || onDelete) && (
+                <td className="px-4 py-3 text-sm flex gap-3">
+
+                    {onEdit && (
+                        <a
+                            href={onEdit(data)}
+                            className="text-blue-600 hover:underline"
+                        >
+                            Edit
+                        </a>
+                    )}
+
+                    {onDelete && (
+                        <button
+                            onClick={() => onDelete(data)}
+                            className="text-red-600 hover:underline"
+                        >
+                            Delete
+                        </button>
+                    )}
+
+                </td>
+            )}
 
         </tr>
     );

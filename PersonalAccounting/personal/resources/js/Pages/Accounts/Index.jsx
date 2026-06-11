@@ -72,6 +72,8 @@ export default function Index({ accounts }) {
                     columns={columns}
                     data={accounts.data}
                     itemsPerPage={10}
+                    onEdit={(row) => `/accounts/${row.id}/edit`}
+                    onDelete={(row) => `/accounts/${row.id}`}
                 />
 
             </div>
