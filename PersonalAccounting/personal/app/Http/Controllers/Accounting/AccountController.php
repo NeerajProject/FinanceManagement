@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Accounting;
 
+use App\Http\Controllers\Controller;
 use Inertia\Inertia;
 use App\Models\Account;
 use App\Services\AccountService;
