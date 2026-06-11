@@ -1,25 +1,105 @@
 import { useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import {
+    Search,
+    Filter,
+    Plus,
+    Trash2,
+    X,
+} from 'lucide-react';
 
-export default function FilterBuilder({
-    fields,
+export default function SearchFilter({
+    fields = [],
     onSearch,
 }) {
+    const [keyword, setKeyword] =
+        useState('');
+
+    const [showFilters, setShowFilters] =
+        useState(false);
+
+    const [condition, setCondition] =
+        useState('and');
+
     const [rules, setRules] = useState([
         {
-            field: '',
-            operator: '=',
+            field:
+                fields?.[0]?.value || '',
+            operator: 'contains',
             value: '',
+            value_to: '',
         },
     ]);
+
+    const normalOperators = [
+        {
+            value: '=',
+            label: 'Equals',
+        },
+        {
+            value: '!=',
+            label: 'Not Equal',
+        },
+        {
+            value: 'contains',
+            label: 'Contains',
+        },
+        {
+            value: 'starts_with',
+            label: 'Starts With',
+        },
+        {
+            value: 'ends_with',
+            label: 'Ends With',
+        },
+        {
+            value: '>',
+            label: 'Greater Than',
+        },
+        {
+            value: '<',
+            label: 'Less Than',
+        },
+    ];
+
+    const dateOperators = [
+        {
+            value: 'between',
+            label: 'Between',
+        },
+        {
+            value: '=',
+            label: 'On',
+        },
+        {
+            value: '>',
+            label: 'After',
+        },
+        {
+            value: '<',
+            label: 'Before',
+        },
+    ];
+
+    const getField = (
+        fieldName
+    ) => {
+        return fields.find(
+            (field) =>
+                field.value === fieldName
+        );
+    };
 
     const addRule = () => {
         setRules([
             ...rules,
             {
-                field: '',
-                operator: '=',
+                field:
+                    fields?.[0]?.value ||
+                    '',
+                operator:
+                    'contains',
                 value: '',
+                value_to: '',
             },
         ]);
     };
@@ -37,225 +117,547 @@ export default function FilterBuilder({
         key,
         value
     ) => {
-        const newRules = [...rules];
+        const copy = [...rules];
 
-        newRules[index][key] = value;
+        copy[index][key] = value;
 
-        setRules(newRules);
+        setRules(copy);
+    };
+
+    const handleSearch = () => {
+        onSearch({
+            search: keyword,
+            condition,
+            filters: rules.filter(
+                (rule) =>
+                    rule.field &&
+                    (rule.value ||
+                        rule.value_to)
+            ),
+        });
+    };
+
+    const clearFilters = () => {
+        setKeyword('');
+
+        setCondition('and');
+
+        setRules([
+            {
+                field:
+                    fields?.[0]?.value ||
+                    '',
+                operator:
+                    'contains',
+                value: '',
+                value_to: '',
+            },
+        ]);
+
+        onSearch({
+            search: '',
+            filters: [],
+        });
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-lg">
+        <div className="bg-white border rounded-lg shadow-sm">
 
-            <div className="px-6 py-4 border-b">
-                <h2 className="font-semibold text-lg">
-                    Custom Filter
-                </h2>
-            </div>
+            {/* Toolbar */}
 
-            <div className="p-6 space-y-4">
+            <div className="p-4">
 
-                <div className="text-sm text-gray-600">
-                    Match any of the following rules
+                <div className="flex flex-col lg:flex-row gap-3">
+
+                    <div className="relative flex-1">
+
+                        <Search
+                            size={18}
+                            className="
+                                absolute
+                                left-3
+                                top-3
+                                text-gray-400
+                            "
+                        />
+
+                        <input
+                            type="text"
+                            value={keyword}
+                            placeholder="Search..."
+                            onChange={(e) =>
+                                setKeyword(
+                                    e.target.value
+                                )
+                            }
+                            onKeyDown={(e) =>
+                                e.key ===
+                                    'Enter' &&
+                                handleSearch()
+                            }
+                            className="
+                                w-full
+                                pl-10
+                                pr-4
+                                py-2
+                                border
+                                rounded-md
+                            "
+                        />
+
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={() =>
+                            setShowFilters(
+                                !showFilters
+                            )
+                        }
+                        className="
+                            flex
+                            items-center
+                            gap-2
+                            border
+                            px-4
+                            py-2
+                            rounded-md
+                        "
+                    >
+                        <Filter size={18} />
+                        Filters
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={
+                            handleSearch
+                        }
+                        className="
+                            bg-blue-600
+                            text-white
+                            px-5
+                            py-2
+                            rounded-md
+                        "
+                    >
+                        Search
+                    </button>
+
                 </div>
 
-                {rules.map(
-                    (rule, index) => (
-                        <div
-                            key={index}
+            </div>
+
+            {/* Filters */}
+
+            {showFilters && (
+
+                <div className="border-t bg-gray-50 p-5">
+
+                    {/* Match */}
+
+                    <div className="mb-5 flex items-center gap-3">
+
+                        <span>
+                            Match
+                        </span>
+
+                        <select
+                            value={
+                                condition
+                            }
+                            onChange={(e) =>
+                                setCondition(
+                                    e.target
+                                        .value
+                                )
+                            }
                             className="
-                                grid
-                                grid-cols-12
-                                gap-3
-                                items-center
+                                border
+                                rounded
+                                px-3
+                                py-2
                             "
                         >
-                            {/* Field */}
+                            <option value="and">
+                                All
+                            </option>
 
-                            <select
-                                value={rule.field}
-                                onChange={(e) =>
-                                    updateRule(
-                                        index,
-                                        'field',
-                                        e.target
-                                            .value
-                                    )
-                                }
-                                className="
-                                    col-span-4
-                                    border
-                                    rounded
-                                    px-3
-                                    py-2
-                                "
-                            >
-                                <option value="">
-                                    Select Field
-                                </option>
+                            <option value="or">
+                                Any
+                            </option>
 
-                                {fields.map(
-                                    (
-                                        field
-                                    ) => (
-                                        <option
-                                            key={
-                                                field.value
-                                            }
-                                            value={
-                                                field.value
-                                            }
-                                        >
-                                            {
-                                                field.label
-                                            }
-                                        </option>
-                                    )
-                                )}
-                            </select>
+                        </select>
 
-                            {/* Operator */}
+                        <span>
+                            conditions
+                        </span>
 
-                            <select
-                                value={
-                                    rule.operator
-                                }
-                                onChange={(e) =>
-                                    updateRule(
-                                        index,
-                                        'operator',
-                                        e.target
-                                            .value
-                                    )
-                                }
-                                className="
-                                    col-span-3
-                                    border
-                                    rounded
-                                    px-3
-                                    py-2
-                                "
-                            >
-                                <option value="=">
-                                    Equal To
-                                </option>
+                    </div>
 
-                                <option value="!=">
-                                    Not Equal
-                                </option>
+                    {/* Rules */}
 
-                                <option value="contains">
-                                    Contains
-                                </option>
+                    {rules.map(
+                        (
+                            rule,
+                            index
+                        ) => {
+                            const field =
+                                getField(
+                                    rule.field
+                                );
 
-                                <option value="starts_with">
-                                    Starts With
-                                </option>
+                            const operators =
+                                field?.type ===
+                                'date'
+                                    ? dateOperators
+                                    : normalOperators;
 
-                                <option value="ends_with">
-                                    Ends With
-                                </option>
-
-                                <option value=">">
-                                    Greater Than
-                                </option>
-
-                                <option value="<">
-                                    Less Than
-                                </option>
-                            </select>
-
-                            {/* Value */}
-
-                            <input
-                                value={
-                                    rule.value
-                                }
-                                onChange={(e) =>
-                                    updateRule(
-                                        index,
-                                        'value',
-                                        e.target
-                                            .value
-                                    )
-                                }
-                                className="
-                                    col-span-4
-                                    border
-                                    rounded
-                                    px-3
-                                    py-2
-                                "
-                                placeholder="Value"
-                            />
-
-                            {/* Delete */}
-
-                            <button
-                                onClick={() =>
-                                    removeRule(
+                            return (
+                                <div
+                                    key={
                                         index
-                                    )
-                                }
-                                className="
-                                    col-span-1
-                                    text-red-500
-                                "
-                            >
-                                <Trash2
-                                    size={18}
-                                />
-                            </button>
+                                    }
+                                    className="
+                                        grid
+                                        grid-cols-12
+                                        gap-3
+                                        mb-3
+                                    "
+                                >
 
-                        </div>
-                    )
-                )}
+                                    {/* Field */}
 
-                <button
-                    onClick={addRule}
-                    className="
-                        flex
-                        items-center
-                        gap-2
-                        text-blue-600
-                        font-medium
-                    "
-                >
-                    <Plus size={16} />
-                    New Rule
-                </button>
+                                    <select
+                                        value={
+                                            rule.field
+                                        }
+                                        onChange={(
+                                            e
+                                        ) =>
+                                            updateRule(
+                                                index,
+                                                'field',
+                                                e
+                                                    .target
+                                                    .value
+                                            )
+                                        }
+                                        className="
+                                            col-span-3
+                                            border
+                                            rounded
+                                            px-3
+                                            py-2
+                                        "
+                                    >
+                                        {fields.map(
+                                            (
+                                                field
+                                            ) => (
+                                                <option
+                                                    key={
+                                                        field.value
+                                                    }
+                                                    value={
+                                                        field.value
+                                                    }
+                                                >
+                                                    {
+                                                        field.label
+                                                    }
+                                                </option>
+                                            )
+                                        )}
+                                    </select>
 
-            </div>
+                                    {/* Operator */}
 
-            <div className="border-t p-4 flex gap-3">
+                                    <select
+                                        value={
+                                            rule.operator
+                                        }
+                                        onChange={(
+                                            e
+                                        ) =>
+                                            updateRule(
+                                                index,
+                                                'operator',
+                                                e
+                                                    .target
+                                                    .value
+                                            )
+                                        }
+                                        className="
+                                            col-span-3
+                                            border
+                                            rounded
+                                            px-3
+                                            py-2
+                                        "
+                                    >
+                                        {operators.map(
+                                            (
+                                                operator
+                                            ) => (
+                                                <option
+                                                    key={
+                                                        operator.value
+                                                    }
+                                                    value={
+                                                        operator.value
+                                                    }
+                                                >
+                                                    {
+                                                        operator.label
+                                                    }
+                                                </option>
+                                            )
+                                        )}
+                                    </select>
 
-                <button
-                    onClick={() =>
-                        onSearch(rules)
-                    }
-                    className="
-                        bg-purple-700
-                        text-white
-                        px-4
-                        py-2
-                        rounded
-                    "
-                >
-                    Search
-                </button>
+                                    {/* Value */}
 
-                <button
-                    className="
-                        bg-gray-100
-                        px-4
-                        py-2
-                        rounded
-                    "
-                >
-                    Discard
-                </button>
+                                    <div className="col-span-5">
 
-            </div>
+                                        {field?.type ===
+                                        'select' ? (
+
+                                            <select
+                                                value={
+                                                    rule.value
+                                                }
+                                                onChange={(
+                                                    e
+                                                ) =>
+                                                    updateRule(
+                                                        index,
+                                                        'value',
+                                                        e
+                                                            .target
+                                                            .value
+                                                    )
+                                                }
+                                                className="
+                                                    w-full
+                                                    border
+                                                    rounded
+                                                    px-3
+                                                    py-2
+                                                "
+                                            >
+                                                <option value="">
+                                                    Select
+                                                </option>
+
+                                                {field.options?.map(
+                                                    (
+                                                        option
+                                                    ) => (
+                                                        <option
+                                                            key={
+                                                                option.value
+                                                            }
+                                                            value={
+                                                                option.value
+                                                            }
+                                                        >
+                                                            {
+                                                                option.label
+                                                            }
+                                                        </option>
+                                                    )
+                                                )}
+
+                                            </select>
+
+                                        ) : field?.type ===
+                                          'date' ? (
+
+                                            rule.operator ===
+                                            'between' ? (
+
+                                                <div className="flex gap-2">
+
+                                                    <input
+                                                        type="date"
+                                                        value={
+                                                            rule.value
+                                                        }
+                                                        onChange={(
+                                                            e
+                                                        ) =>
+                                                            updateRule(
+                                                                index,
+                                                                'value',
+                                                                e
+                                                                    .target
+                                                                    .value
+                                                            )
+                                                        }
+                                                        className="
+                                                            flex-1
+                                                            border
+                                                            rounded
+                                                            px-3
+                                                            py-2
+                                                        "
+                                                    />
+
+                                                    <input
+                                                        type="date"
+                                                        value={
+                                                            rule.value_to
+                                                        }
+                                                        onChange={(
+                                                            e
+                                                        ) =>
+                                                            updateRule(
+                                                                index,
+                                                                'value_to',
+                                                                e
+                                                                    .target
+                                                                    .value
+                                                            )
+                                                        }
+                                                        className="
+                                                            flex-1
+                                                            border
+                                                            rounded
+                                                            px-3
+                                                            py-2
+                                                        "
+                                                    />
+
+                                                </div>
+
+                                            ) : (
+
+                                                <input
+                                                    type="date"
+                                                    value={
+                                                        rule.value
+                                                    }
+                                                    onChange={(
+                                                        e
+                                                    ) =>
+                                                        updateRule(
+                                                            index,
+                                                            'value',
+                                                            e
+                                                                .target
+                                                                .value
+                                                        )
+                                                    }
+                                                    className="
+                                                        w-full
+                                                        border
+                                                        rounded
+                                                        px-3
+                                                        py-2
+                                                    "
+                                                />
+
+                                            )
+
+                                        ) : (
+
+                                            <input
+                                                type="text"
+                                                value={
+                                                    rule.value
+                                                }
+                                                onChange={(
+                                                    e
+                                                ) =>
+                                                    updateRule(
+                                                        index,
+                                                        'value',
+                                                        e
+                                                            .target
+                                                            .value
+                                                    )
+                                                }
+                                                className="
+                                                    w-full
+                                                    border
+                                                    rounded
+                                                    px-3
+                                                    py-2
+                                                "
+                                                placeholder="Value"
+                                            />
+
+                                        )}
+
+                                    </div>
+
+                                    {/* Delete */}
+
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            removeRule(
+                                                index
+                                            )
+                                        }
+                                        className="
+                                            text-red-500
+                                        "
+                                    >
+                                        <Trash2
+                                            size={
+                                                18
+                                            }
+                                        />
+                                    </button>
+
+                                </div>
+                            );
+                        }
+                    )}
+
+                    {/* Footer */}
+
+                    <div className="flex gap-4 mt-5">
+
+                        <button
+                            type="button"
+                            onClick={
+                                addRule
+                            }
+                            className="
+                                flex
+                                items-center
+                                gap-2
+                                text-blue-600
+                            "
+                        >
+                            <Plus size={16} />
+                            Add Rule
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={
+                                clearFilters
+                            }
+                            className="
+                                flex
+                                items-center
+                                gap-2
+                                text-gray-600
+                            "
+                        >
+                            <X size={16} />
+                            Clear
+                        </button>
+
+                    </div>
+
+                </div>
+
+            )}
 
         </div>
     );

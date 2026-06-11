@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import DataTable from '@/Components/DataTable';
-import FilterBuilder from '@/Components/FilterBuilder';
+import SearchFilter from '@/Components/FilterBuilder';
 
 export default function Index({ accounts }) {
 
@@ -65,6 +65,67 @@ export default function Index({ accounts }) {
         <AuthenticatedLayout>
             <Head title="Accounts" />
 
+        <SearchFilter
+    fields={[
+        {
+            value: 'code',
+            label: 'Code',
+            type: 'text',
+        },
+        {
+            value: 'name',
+            label: 'Name',
+            type: 'text',
+        },
+        {
+            value: 'account_type',
+            label: 'Account Type',
+            type: 'select',
+            options: [
+                {
+                    value: 'asset_receivable',
+                    label: 'Receivable',
+                },
+                {
+                    value: 'asset_cash',
+                    label: 'Cash',
+                },
+            ],
+        },
+        {
+            value: 'is_active',
+            label: 'Status',
+            type: 'select',
+            options: [
+                {
+                    value: 1,
+                    label: 'Active',
+                },
+                {
+                    value: 0,
+                    label: 'Inactive',
+                },
+            ],
+        },
+        {
+            value: 'created_at',
+            label: 'Created Date',
+            type: 'date',
+        },
+    ]}
+    onSearch={(payload) => {
+        console.log('Search payload:', payload);
+        router.get(
+            route('accounts.index'),
+            payload,
+            {
+                preserveState: true,
+                replace: true,
+            }
+        );
+    }}
+/>
+
             <div className="p-6 space-y-4">
 
                 {/* HEADER */}
@@ -80,15 +141,7 @@ export default function Index({ accounts }) {
                         Create
                     </Link>
                 </div>
-                  <FilterBuilder
-                    fields={[
-                        { value: 'id', label: 'ID', type: 'number' },
-                        { value: 'name', label: 'Name', type: 'text' },
-                        { value: 'email', label: 'Email', type: 'text' },
-                        { value: 'status', label: 'Status', type: 'select' },
-                    ]}
-                    onSearch={handleFilter}
-                />
+               
                 {/* TABLE */}
                 <DataTable
                     title="Accounts"
