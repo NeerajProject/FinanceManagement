@@ -40,11 +40,17 @@ class AccountController extends Controller
                     'search' =>
                         $request->search,
 
-                    'condition' =>
-                        $request->condition,
+                    'status' =>
+                        $request->status,
 
-                    'rules' =>
-                        $request->filters,
+                    'types' =>
+                        $request->types,
+
+                    'group_by' =>
+                        $request->group_by,
+
+                    'custom_filters' =>
+                        $request->custom_filters,
                 ],
             ]
         );

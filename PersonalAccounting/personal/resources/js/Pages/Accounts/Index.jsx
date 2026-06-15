@@ -59,6 +59,7 @@ export default function Index({ accounts, filters }) {
             initialStatus={filters?.status}
             initialTypes={filters?.types}
             initialGroupBy={filters?.group_by}
+            initialCustomFilters={filters?.custom_filters}
             onSearch={(payload) => {
                 router.get(
                     route('accounts.index'),

@@ -72,6 +72,47 @@ class AccountRepository implements AccountRepositoryInterface
 
         /*
         |--------------------------------------------------------------------------
+        | Custom Filters
+        |--------------------------------------------------------------------------
+        */
+        if (!empty($filters['custom_filters'])) {
+            foreach ($filters['custom_filters'] as $filter) {
+                if (empty($filter['field'])) {
+                    continue;
+                }
+
+                $field = $filter['field'];
+                $operator = $filter['operator'] ?? '=';
+                $value = $filter['value'] ?? null;
+
+                switch ($operator) {
+                    case '=':
+                        $query->where($field, '=', $value);
+                        break;
+                    case '!=':
+                        $query->where($field, '!=', $value);
+                        break;
+                    case 'contains':
+                        $query->where($field, 'like', "%{$value}%");
+                        break;
+                    case 'starts_with':
+                        $query->where($field, 'like', "{$value}%");
+                        break;
+                    case 'ends_with':
+                        $query->where($field, 'like', "%{$value}");
+                        break;
+                    case '>':
+                        $query->where($field, '>', $value);
+                        break;
+                    case '<':
+                        $query->where($field, '<', $value);
+                        break;
+                }
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
         | Group By / Sorting
         |--------------------------------------------------------------------------
         */
