@@ -49,143 +49,39 @@ class AccountRepository implements AccountRepositoryInterface
 
         /*
         |--------------------------------------------------------------------------
-        | Advanced Filters
+        | Status Filter
         |--------------------------------------------------------------------------
         */
-
-        $condition =
-            $filters['condition']
-            ?? 'and';
-
-        foreach (
-            $filters['filters']
-            ?? []
-            as $filter
-        ) {
-
-            if (
-                empty(
-                    $filter['field']
-                )
-            ) {
-                continue;
-            }
-
-            $field =
-                $filter['field'];
-
-            $operator =
-                $filter['operator']
-                ?? '=';
-
-            $value =
-                $filter['value']
-                ?? null;
-
-            $method =
-                $condition === 'or'
-                    ? 'orWhere'
-                    : 'where';
-
-            switch ($operator) {
-
-                case '=':
-
-                    $query->{$method}(
-                        $field,
-                        '=',
-                        $value
-                    );
-
-                    break;
-
-                case '!=':
-
-                    $query->{$method}(
-                        $field,
-                        '!=',
-                        $value
-                    );
-
-                    break;
-
-                case 'contains':
-
-                    $query->{$method}(
-                        $field,
-                        'like',
-                        "%{$value}%"
-                    );
-
-                    break;
-
-                case 'starts_with':
-
-                    $query->{$method}(
-                        $field,
-                        'like',
-                        "{$value}%"
-                    );
-
-                    break;
-
-                case 'ends_with':
-
-                    $query->{$method}(
-                        $field,
-                        'like',
-                        "%{$value}"
-                    );
-
-                    break;
-
-                case '>':
-
-                    $query->{$method}(
-                        $field,
-                        '>',
-                        $value
-                    );
-
-                    break;
-
-                case '<':
-
-                    $query->{$method}(
-                        $field,
-                        '<',
-                        $value
-                    );
-
-                    break;
-
-                case 'between':
-
-                    if (
-                        !empty(
-                            $filter[
-                                'value_to'
-                            ]
-                        )
-                    ) {
-
-                        $query->whereBetween(
-                            $field,
-                            [
-                                $value,
-                                $filter[
-                                    'value_to'
-                                ],
-                            ]
-                        );
-                    }
-
-                    break;
+        if (!empty($filters['status'])) {
+            if ($filters['status'] === 'active') {
+                $query->where('is_active', true);
+            } elseif ($filters['status'] === 'inactive') {
+                $query->where('is_active', false);
             }
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Types Filter
+        |--------------------------------------------------------------------------
+        */
+        if (!empty($filters['types'])) {
+            $types = is_array($filters['types']) ? $filters['types'] : [$filters['types']];
+            $query->whereIn('account_type', $types);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Group By / Sorting
+        |--------------------------------------------------------------------------
+        */
+        if (!empty($filters['group_by'])) {
+            $query->orderBy($filters['group_by'], 'asc');
+        } else {
+            $query->latest();
+        }
+
         return $query
-            ->latest()
             ->paginate($perPage)
             ->withQueryString();
     }

@@ -56,66 +56,20 @@ export default function Index({ accounts, filters }) {
 
         <SearchFilter
             initialSearch={filters?.search}
-            initialCondition={filters?.condition}
-            initialRules={filters?.rules}
-            fields={[
-        {
-            value: 'code',
-            label: 'Code',
-            type: 'text',
-        },
-        {
-            value: 'name',
-            label: 'Name',
-            type: 'text',
-        },
-        {
-            value: 'account_type',
-            label: 'Account Type',
-            type: 'select',
-            options: [
-                {
-                    value: 'asset_receivable',
-                    label: 'Receivable',
-                },
-                {
-                    value: 'asset_cash',
-                    label: 'Cash',
-                },
-            ],
-        },
-        {
-            value: 'is_active',
-            label: 'Status',
-            type: 'select',
-            options: [
-                {
-                    value: 1,
-                    label: 'Active',
-                },
-                {
-                    value: 0,
-                    label: 'Inactive',
-                },
-            ],
-        },
-        {
-            value: 'created_at',
-            label: 'Created Date',
-            type: 'date',
-        },
-    ]}
-    onSearch={(payload) => {
-        router.get(
-            route('accounts.index'),
-            payload,
-            {
-                preserveState: true,
-                replace: true,
-            }
-        );
-    }}
-/>
+            initialStatus={filters?.status}
+            initialTypes={filters?.types}
+            initialGroupBy={filters?.group_by}
+            onSearch={(payload) => {
+                router.get(
+                    route('accounts.index'),
+                    payload,
+                    {
+                        preserveState: true,
+                        replace: true,
+                    }
+                );
+            }}
+        />
 
 
 <Card>
