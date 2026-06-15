@@ -10,25 +10,37 @@ import {
 export default function SearchFilter({
     fields = [],
     onSearch,
+    initialSearch = '',
+    initialCondition = 'and',
+    initialRules = null,
 }) {
     const [keyword, setKeyword] =
-        useState('');
+        useState(initialSearch);
 
     const [showFilters, setShowFilters] =
-        useState(false);
+        useState(!!(initialRules && Object.keys(initialRules).length > 0));
 
     const [condition, setCondition] =
-        useState('and');
+        useState(initialCondition);
 
-    const [rules, setRules] = useState([
-        {
-            field:
-                fields?.[0]?.value || '',
-            operator: 'contains',
-            value: '',
-            value_to: '',
-        },
-    ]);
+    // If initialRules is parsed from query string, it might be an array or an object (due to PHP array serialization in query params)
+    const parsedRules = initialRules 
+        ? (Array.isArray(initialRules) ? initialRules : Object.values(initialRules))
+        : [];
+
+    const [rules, setRules] = useState(
+        parsedRules.length > 0
+            ? parsedRules
+            : [
+                {
+                    field:
+                        fields?.[0]?.value || '',
+                    operator: 'contains',
+                    value: '',
+                    value_to: '',
+                },
+            ]
+    );
 
     const normalOperators = [
         {
@@ -131,8 +143,8 @@ export default function SearchFilter({
             filters: rules.filter(
                 (rule) =>
                     rule.field &&
-                    (rule.value ||
-                        rule.value_to)
+                    ((rule.value !== '' && rule.value !== undefined && rule.value !== null) ||
+                     (rule.value_to !== '' && rule.value_to !== undefined && rule.value_to !== null))
             ),
         });
     };

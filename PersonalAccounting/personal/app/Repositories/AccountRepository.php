@@ -218,8 +218,6 @@ public function all(): Collection
         Account $account,
         array $data
     ): Account {
-                dd('paginate method called with perPage: ' . $perPage);
-
         $account->update($data);
 
         return $account->refresh();

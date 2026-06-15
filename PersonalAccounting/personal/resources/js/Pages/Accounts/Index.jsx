@@ -5,7 +5,7 @@ import SearchFilter from '@/Components/FilterBuilder';
 import Card from '@/Components/Card';
 import { router } from '@inertiajs/react';
 
-export default function Index({ accounts }) {
+export default function Index({ accounts, filters }) {
 
   const columns = [
     {   label:"Code",
@@ -55,7 +55,10 @@ export default function Index({ accounts }) {
             <Head title="Accounts" />
 
         <SearchFilter
-    fields={[
+            initialSearch={filters?.search}
+            initialCondition={filters?.condition}
+            initialRules={filters?.rules}
+            fields={[
         {
             value: 'code',
             label: 'Code',
@@ -102,18 +105,15 @@ export default function Index({ accounts }) {
             type: 'date',
         },
     ]}
-      onSearch={(payload) => {
-
+    onSearch={(payload) => {
         router.get(
-           'accounts.index',
+            route('accounts.index'),
             payload,
             {
                 preserveState: true,
                 replace: true,
             }
         );
-
-
     }}
 />
 
@@ -142,7 +142,7 @@ export default function Index({ accounts }) {
                     data={accounts.data}
                     itemsPerPage={5}
                     onEdit={(row) => `/accounts/${row.id}/edit`}
-                    onDelete={(row) => `/accounts/${row.id}/delete`}
+                    onDelete={(row) => `/accounts/${row.id}`}
                 />
 
             </div>

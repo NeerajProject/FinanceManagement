@@ -12,7 +12,7 @@ class UpdateAccountRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,8 +22,19 @@ class UpdateAccountRequest extends FormRequest
      */
     public function rules(): array
     {
+        $accountId = $this->route('account') instanceof \App\Models\Account
+            ? $this->route('account')->id
+            : $this->route('account');
+
         return [
-            //
+            'code' => 'required|unique:accounts,code,' . $accountId,
+            'name' => 'required',
+            'account_type' => 'required',
+            'currency_code' => 'nullable',
+            'reconcile' => 'boolean',
+            'is_active' => 'boolean',
+            'parent_id' => 'nullable|exists:accounts,id',
+            'notes' => 'nullable'
         ];
     }
 }

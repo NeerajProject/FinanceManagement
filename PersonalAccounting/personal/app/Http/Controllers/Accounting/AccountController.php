@@ -57,7 +57,7 @@ class AccountController extends Controller
                 'types' =>
                     Account::getAccountTypes(),
 
-                'parents' =>
+                'parentAccounts' =>
                     $this->repository->getParents(),
             ]
         );
@@ -85,7 +85,7 @@ class AccountController extends Controller
             [
                 'account' => $account,
                 'types' => Account::getAccountTypes(),
-                'parents' =>
+                'parentAccounts' =>
                     $this->repository->getParents(),
             ]
         );
