@@ -1,139 +1,159 @@
-import { Link, router } from '@inertiajs/react';
-import {
-    Pencil,
-    Trash2,
-} from 'lucide-react';
+import { router } from '@inertiajs/react';
+import { Trash2 } from 'lucide-react';
 
 export default function TableRow({
-    columns = [],
-    data = {},
+
+    columns,
+
+    data,
+
     onEdit,
+
     onDelete,
+
 }) {
-    const handleDelete = () => {
 
-        if (
-            confirm(
-                'Are you sure you want to delete this record?'
-            )
-        ) {
+    const handleEdit = () => {
 
-            router.delete(
-                onDelete(data),
-                {
-                    preserveScroll: true,
-                }
-            );
+        if (!onEdit) return;
 
-        }
+        const url = typeof onEdit === 'function'
+            ? onEdit(data)
+            : onEdit;
+
+        router.visit(url);
+
     };
 
+
+    const handleDelete = (e) => {
+
+        e.stopPropagation();
+
+        if (!confirm('Are you sure?')) {
+
+            return;
+
+        }
+
+        const url = typeof onDelete === 'function'
+            ? onDelete(data)
+            : onDelete;
+
+        router.delete(url);
+
+    };
+
+
     return (
-        <tr className="
-            border-b
-            border-gray-100
-            hover:bg-gray-50
-            transition-colors
-        ">
 
-            {/* Data Columns */}
+        <tr
 
-            {columns.map((col) => {
+            onClick={handleEdit}
 
-                const value =
-                    data[col.accessor];
+            className="
+                cursor-pointer
 
-                return (
+                hover:bg-gray-50
+
+                transition-colors
+            "
+
+        >
+
+            {
+
+                columns.map((column) => (
+
                     <td
-                        key={`${data.id}-${col.accessor}`}
+
+                        key={column.accessor}
+
                         className="
-                            px-4
-                            py-3
+                            px-6
+
+                            py-4
+
                             text-sm
+
                             text-gray-700
-                            whitespace-nowrap
                         "
+
                     >
-                        {col.options
-                            ? col.options[value] ??
-                              value ??
-                              '-'
-                            : value ?? '-'}
+
+                        {
+
+                            column.options
+
+                            ?
+
+                            column.options[data[column.accessor]]
+
+                            :
+
+                            data[column.accessor]
+
+                        }
+
                     </td>
-                );
-            })}
 
-            {/* Actions */}
+                ))
 
-            {(onEdit || onDelete) && (
+            }
 
-                <td className="px-4 py-3">
 
-                    <div className="flex items-center gap-3">
+            {/* Delete */}
 
-                        {onEdit && (
+            <td
 
-                            <Link
-                                href={onEdit(
-                                    data
-                                )}
-                                className="
-                                    inline-flex
-                                    items-center
-                                    gap-1
-                                    text-blue-600
-                                    hover:text-blue-800
-                                "
-                            >
-                                <Pencil
-                                    size={
-                                        16
-                                    }
-                                />
+                className="
+                    px-4
 
-                                <span>
-                                    Edit
-                                </span>
+                    py-4
 
-                            </Link>
+                    w-16
 
-                        )}
+                    text-right
+                "
 
-                        {onDelete && (
+            >
 
-                            <button
-                                type="button"
-                                onClick={
-                                    handleDelete
-                                }
-                                className="
-                                    inline-flex
-                                    items-center
-                                    gap-1
-                                    text-red-600
-                                    hover:text-red-800
-                                "
-                            >
-                                <Trash2
-                                    size={
-                                        16
-                                    }
-                                />
+                {
 
-                                <span>
-                                    Delete
-                                </span>
+                    onDelete && (
 
-                            </button>
+                        <button
 
-                        )}
+                            onClick={handleDelete}
 
-                    </div>
+                            className="
+                                p-2
 
-                </td>
+                                rounded-full
 
-            )}
+                                text-gray-400
+
+                                hover:text-red-600
+
+                                hover:bg-red-50
+
+                                transition
+                            "
+
+                        >
+
+                            <Trash2 size={18} />
+
+                        </button>
+
+                    )
+
+                }
+
+            </td>
 
         </tr>
+
     );
+
 }

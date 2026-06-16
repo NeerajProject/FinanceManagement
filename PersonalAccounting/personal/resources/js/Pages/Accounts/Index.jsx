@@ -210,7 +210,7 @@ export default function Index({
 
             <div className="p-6">
 
-                <Card>
+     
 
                     <DataTable
 
@@ -226,7 +226,6 @@ export default function Index({
 
                     />
 
-                </Card>
 
             </div>
 
