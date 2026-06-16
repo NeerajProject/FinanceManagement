@@ -22,53 +22,7 @@ export default function ListHeader({
 
             {/* Title */}
 
-            <div className="flex items-center gap-3 mb-5">
-
-                <h1 className="text-4xl font-light text-gray-900">
-
-                    {title}
-
-                </h1>
-
-                {
-
-                    count !== null && (
-
-                        <span
-
-                            className="
-                                inline-flex
-                                items-center
-                                justify-center
-
-                                min-w-[32px]
-                                h-8
-
-                                px-2
-
-                                rounded-full
-
-                                bg-gray-100
-
-                                text-gray-600
-
-                                text-sm
-
-                                font-medium
-                            "
-
-                        >
-
-                            {count}
-
-                        </span>
-
-                    )
-
-                }
-
-            </div>
-
+         
 
 
             {/* Search / Filters + Buttons */}
