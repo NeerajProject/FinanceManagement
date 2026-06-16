@@ -1,7 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
+import { useState } from 'react';
 
 export default function Edit({ account, parentAccounts = [] }) {
+
+    const [tab, setTab] = useState('general');
 
     const { data, setData, put, processing, errors } = useForm({
         code: account.code || '',
@@ -16,212 +19,429 @@ export default function Edit({ account, parentAccounts = [] }) {
 
     const submit = (e) => {
         e.preventDefault();
-
         put(route('accounts.update', account.id));
     };
 
     return (
+
         <AuthenticatedLayout>
+
             <Head title="Edit Account" />
 
-            <div className="max-w-5xl mx-auto p-6">
+            <div className="min-h-screen bg-gray-100">
 
-                <div className="bg-white shadow rounded-lg border">
+                {/* HEADER BAR */}
 
-                    {/* HEADER */}
-                    <div className="border-b px-6 py-4">
-                        <h1 className="text-2xl font-bold">
-                            Edit Account
-                        </h1>
-                        <p className="text-sm text-gray-500">
-                            Update account details
-                        </p>
+                <div className="bg-white border-b px-6 py-4 flex justify-between items-center sticky top-0 z-20">
+
+                    <div className="flex gap-3">
+
+                        <button
+                            onClick={submit}
+                            className="bg-violet-600 hover:bg-violet-700 text-white px-6 py-2 rounded"
+                        >
+                            Save
+                        </button>
+
+                        <button
+                            onClick={() => window.history.back()}
+                            className="border px-6 py-2 rounded bg-gray-50 hover:bg-gray-100"
+                        >
+                            Discard
+                        </button>
+
                     </div>
 
-                    {/* FORM */}
-                    <form onSubmit={submit} className="p-6 space-y-6">
+                    <div className="text-gray-600">
+                        Accounts /
+                        <span className="font-semibold text-gray-900">
+                            {' '}Edit
+                        </span>
+                    </div>
 
-                        {/* CODE */}
-                        <div>
-                            <label className="block mb-1 font-medium">
-                                Account Code
-                            </label>
+                </div>
 
-                            <input
-                                type="text"
-                                value={data.code}
-                                onChange={(e) => setData('code', e.target.value)}
-                                className="w-full border rounded px-3 py-2"
-                            />
+                {/* FORM SHEET */}
 
-                            {errors.code && (
-                                <p className="text-red-500 text-sm">
-                                    {errors.code}
-                                </p>
-                            )}
-                        </div>
+                <div className="p-8">
 
-                        {/* NAME */}
-                        <div>
-                            <label className="block mb-1 font-medium">
-                                Account Name
-                            </label>
+                    <form onSubmit={submit}>
 
-                            <input
-                                type="text"
-                                value={data.name}
-                                onChange={(e) => setData('name', e.target.value)}
-                                className="w-full border rounded px-3 py-2"
-                            />
+                        <div className="bg-white border rounded shadow-sm">
 
-                            {errors.name && (
-                                <p className="text-red-500 text-sm">
-                                    {errors.name}
-                                </p>
-                            )}
-                        </div>
+                            {/* TITLE */}
 
-                        {/* ACCOUNT TYPE */}
-                        <div>
-                            <label className="block mb-1 font-medium">
-                                Account Type
-                            </label>
+                            <div className="px-10 pt-10">
 
-                            <select
-                                value={data.account_type}
-                                onChange={(e) =>
-                                    setData('account_type', e.target.value)
-                                }
-                                className="w-full border rounded px-3 py-2"
-                            >
-                                <option value="">Select Account Type</option>
+                                <div className="uppercase text-gray-400 text-sm font-semibold">
+                                    ACCOUNT TITLE
+                                </div>
 
-                                <option value="asset_cash">Cash</option>
-                                <option value="asset_receivable">Receivable</option>
-                                <option value="asset_current">Current Asset</option>
-                                <option value="asset_non_current">Non Current Asset</option>
+                                <h1 className="text-4xl font-bold text-violet-600 mt-2">
+                                    {data.name || 'New'}
+                                </h1>
 
-                                <option value="liability_payable">Payable</option>
-                                <option value="liability_credit_card">Credit Card</option>
+                            </div>
 
-                                <option value="equity">Equity</option>
 
-                                <option value="income">Income</option>
-                                <option value="expense">Expense</option>
+                            <div className="border-t mt-8"></div>
 
-                                <option value="off_balance">Off Balance</option>
-                            </select>
 
-                            {errors.account_type && (
-                                <p className="text-red-500 text-sm">
-                                    {errors.account_type}
-                                </p>
-                            )}
-                        </div>
+                            {/* FORM GRID */}
 
-                        {/* PARENT */}
-                        <div>
-                            <label className="block mb-1 font-medium">
-                                Parent Account
-                            </label>
+                            <div className="grid grid-cols-2 gap-x-16 gap-y-4 px-10 py-10">
 
-                            <select
-                                value={data.parent_id}
-                                onChange={(e) => setData('parent_id', e.target.value)}
-                                className="w-full border rounded px-3 py-2"
-                            >
-                                <option value="">None</option>
+                                {/* LEFT */}
 
-                                {parentAccounts.map((acc) => (
-                                    <option key={acc.id} value={acc.id}>
-                                        {acc.code} - {acc.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                                <Field
+                                    label="Account Code"
+                                    error={errors.code}
+                                >
 
-                        {/* CURRENCY */}
-                        <div>
-                            <label className="block mb-1 font-medium">
-                                Currency
-                            </label>
+                                    <input
+                                        type="text"
+                                        value={data.code}
+                                        onChange={(e) =>
+                                            setData('code', e.target.value)
+                                        }
+                                        className="input"
+                                        placeholder="e.g. 101000"
+                                    />
 
-                            <input
-                                type="text"
-                                value={data.currency_code}
-                                onChange={(e) =>
-                                    setData('currency_code', e.target.value)
-                                }
-                                className="w-full border rounded px-3 py-2"
-                            />
-                        </div>
+                                </Field>
 
-                        {/* FLAGS */}
-                        <div className="flex gap-6">
 
-                            <label className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    checked={data.reconcile}
-                                    onChange={(e) =>
-                                        setData('reconcile', e.target.checked)
-                                    }
-                                />
-                                Reconcile
-                            </label>
+                                <Field label="Parent Account">
 
-                            <label className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    checked={data.is_active}
-                                    onChange={(e) =>
-                                        setData('is_active', e.target.checked)
-                                    }
-                                />
-                                Active
-                            </label>
+                                    <select
+                                        value={data.parent_id}
+                                        onChange={(e) =>
+                                            setData(
+                                                'parent_id',
+                                                e.target.value
+                                            )
+                                        }
+                                        className="input"
+                                    >
 
-                        </div>
+                                        <option value="">
+                                            None
+                                        </option>
 
-                        {/* NOTES */}
-                        <div>
-                            <label className="block mb-1 font-medium">
-                                Notes
-                            </label>
+                                        {parentAccounts.map(acc => (
 
-                            <textarea
-                                rows="4"
-                                value={data.notes}
-                                onChange={(e) => setData('notes', e.target.value)}
-                                className="w-full border rounded px-3 py-2"
-                            />
-                        </div>
+                                            <option
+                                                key={acc.id}
+                                                value={acc.id}
+                                            >
 
-                        {/* ACTIONS */}
-                        <div className="flex justify-end gap-3">
+                                                {acc.code} - {acc.name}
 
-                            <button
-                                type="button"
-                                onClick={() => window.history.back()}
-                                className="px-4 py-2 bg-gray-500 text-white rounded"
-                            >
-                                Cancel
-                            </button>
+                                            </option>
 
-                            <button
-                                type="submit"
-                                disabled={processing}
-                                className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
-                            >
-                                {processing ? 'Updating...' : 'Update Account'}
-                            </button>
+                                        ))}
+
+                                    </select>
+
+                                </Field>
+
+
+                                <Field
+                                    label="Account Name"
+                                    error={errors.name}
+                                >
+
+                                    <input
+                                        type="text"
+                                        value={data.name}
+                                        onChange={(e) =>
+                                            setData(
+                                                'name',
+                                                e.target.value
+                                            )
+                                        }
+                                        className="input"
+                                        placeholder="e.g Current Assets"
+                                    />
+
+                                </Field>
+
+
+                                <Field label="Currency">
+
+                                    <input
+                                        type="text"
+                                        value={data.currency_code}
+                                        onChange={(e) =>
+                                            setData(
+                                                'currency_code',
+                                                e.target.value
+                                            )
+                                        }
+                                        className="input"
+                                    />
+
+                                </Field>
+
+
+                                <Field
+                                    label="Account Type"
+                                    error={errors.account_type}
+                                >
+
+                                    <select
+                                        value={data.account_type}
+                                        onChange={(e) =>
+                                            setData(
+                                                'account_type',
+                                                e.target.value
+                                            )
+                                        }
+                                        className="input"
+                                    >
+
+                                        <option value="">
+                                            Select Account Type...
+                                        </option>
+
+                                        <option value="asset_cash">
+                                            Cash
+                                        </option>
+
+                                        <option value="asset_receivable">
+                                            Receivable
+                                        </option>
+
+                                        <option value="asset_current">
+                                            Current Asset
+                                        </option>
+
+                                        <option value="asset_non_current">
+                                            Non Current Asset
+                                        </option>
+
+                                        <option value="liability_payable">
+                                            Payable
+                                        </option>
+
+                                        <option value="liability_credit_card">
+                                            Credit Card
+                                        </option>
+
+                                        <option value="equity">
+                                            Equity
+                                        </option>
+
+                                        <option value="income">
+                                            Income
+                                        </option>
+
+                                        <option value="expense">
+                                            Expense
+                                        </option>
+
+                                    </select>
+
+                                </Field>
+
+
+                                <Field label="Allow Reconcile">
+
+                                    <input
+                                        type="checkbox"
+                                        checked={data.reconcile}
+                                        onChange={(e) =>
+                                            setData(
+                                                'reconcile',
+                                                e.target.checked
+                                            )
+                                        }
+                                        className="w-5 h-5"
+                                    />
+
+                                </Field>
+
+
+                                <div></div>
+
+
+                                <Field label="Active">
+
+                                    <input
+                                        type="checkbox"
+                                        checked={data.is_active}
+                                        onChange={(e) =>
+                                            setData(
+                                                'is_active',
+                                                e.target.checked
+                                            )
+                                        }
+                                        className="w-5 h-5"
+                                    />
+
+                                </Field>
+
+                            </div>
+
+
+                            {/* TABS */}
+
+                            <div className="px-10">
+
+                                <div className="flex border-b">
+
+                                    <TabButton
+                                        active={tab === 'general'}
+                                        onClick={() =>
+                                            setTab('general')
+                                        }
+                                    >
+                                        General Settings
+                                    </TabButton>
+
+                                    <TabButton
+                                        active={tab === 'accounting'}
+                                        onClick={() =>
+                                            setTab('accounting')
+                                        }
+                                    >
+                                        Accounting
+                                    </TabButton>
+
+                                    <TabButton
+                                        active={tab === 'notes'}
+                                        onClick={() =>
+                                            setTab('notes')
+                                        }
+                                    >
+                                        Internal Notes
+                                    </TabButton>
+
+                                </div>
+
+
+                                <div className="py-8">
+
+                                    {tab === 'general' && (
+
+                                        <p className="text-gray-500 italic">
+
+                                            Configure basic parameters for
+                                            this account ledger.
+
+                                        </p>
+
+                                    )}
+
+
+                                    {tab === 'accounting' && (
+
+                                        <div>
+
+                                            Accounting fields here
+
+                                        </div>
+
+                                    )}
+
+
+                                    {tab === 'notes' && (
+
+                                        <textarea
+                                            rows={6}
+                                            value={data.notes}
+                                            onChange={(e) =>
+                                                setData(
+                                                    'notes',
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="w-full border rounded p-3"
+                                        />
+
+                                    )}
+
+                                </div>
+
+                            </div>
 
                         </div>
 
                     </form>
 
                 </div>
+
             </div>
+
         </AuthenticatedLayout>
+
     );
+}
+
+
+
+function Field({ label, children, error }) {
+
+    return (
+
+        <div className="flex items-center border-b pb-3">
+
+            <div className="w-52 font-semibold text-gray-700">
+
+                {label}
+
+            </div>
+
+            <div className="flex-1">
+
+                {children}
+
+                {error && (
+
+                    <div className="text-red-500 text-sm mt-1">
+
+                        {error}
+
+                    </div>
+
+                )}
+
+            </div>
+
+        </div>
+
+    );
+
+}
+
+
+function TabButton({
+    children,
+    active,
+    onClick
+}) {
+
+    return (
+
+        <button
+            type="button"
+            onClick={onClick}
+            className={`
+                px-5 py-3 text-lg
+                border-b-2
+                transition
+                ${
+                    active
+                    ? 'border-violet-600 text-violet-600 font-semibold'
+                    : 'border-transparent text-gray-500'
+                }
+            `}
+        >
+
+            {children}
+
+        </button>
+
+    );
+
 }
