@@ -1,280 +1,298 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm } from '@inertiajs/react';
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { Head, useForm } from "@inertiajs/react";
+import { useState } from "react";
+import SmartButton from "@/Components/SmartButton";
+import {
+    Receipt,
+    FileText,
+    CreditCard,
+    Users
+} from "lucide-react";
 
-export default function Create({ parentAccounts = [] }) {
-    const { data, setData, post, processing, errors } = useForm({
-        code: '',
-        name: '',
-        account_type: '',
-        parent_id: '',
-        currency_code: 'INR',
-        reconcile: false,
-        is_active: true,
-        notes: '',
+// Odoo-style Form Field
+function FormField({ label, children, error }) {
+    return (
+        <div className="py-2 border-b border-gray-100 flex items-start gap-2 last:border-0">
+            <label className="w-40 shrink-0 pt-1.5 text-sm font-semibold text-gray-600">
+                {label}
+            </label>
+            <div className="flex-1">
+                {children}
+                {error && (
+                    <p className="mt-1 text-xs text-red-600 font-medium">
+                        {error}
+                    </p>
+                )}
+            </div>
+        </div>
+    );
+}
+
+export default function Create({
+    account = null,
+    parentAccounts = [],
+}) {
+    const [activeTab, setActiveTab] = useState("general");
+    const isEditMode = !!account;
+
+    const {
+        data,
+        setData,
+        post,
+        put,
+        processing,
+        errors,
+    } = useForm({
+        code: account?.code || "",
+        name: account?.name || "",
+        account_type: account?.account_type || "",
+        parent_id: account?.parent_id || "",
+        currency_code: account?.currency_code || "INR",
+        reconcile: account?.reconcile || false,
+        is_active: account?.is_active ?? true,
+        notes: account?.notes || "",
     });
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('accounts.store'));
+        if (isEditMode) {
+            put(route("accounts.update", account.id));
+        } else {
+            post(route("accounts.store"));
+        }
     };
 
-    // ✅ STATIC ACCOUNT TYPES (NO DB)
-    const accountTypeGroups = [
-        {
-            label: 'Assets',
-            options: [
-                { value: 'asset_receivable', label: 'Receivable' },
-                { value: 'asset_cash', label: 'Cash' },
-                { value: 'asset_current', label: 'Current Asset' },
-                { value: 'asset_non_current', label: 'Non Current Asset' },
-                { value: 'asset_prepayments', label: 'Prepayments' },
-                { value: 'asset_fixed', label: 'Fixed Asset' },
-            ],
-        },
-        {
-            label: 'Liabilities',
-            options: [
-                { value: 'liability_payable', label: 'Payable' },
-                { value: 'liability_credit_card', label: 'Credit Card' },
-                { value: 'liability_current', label: 'Current Liability' },
-                { value: 'liability_non_current', label: 'Non Current Liability' },
-            ],
-        },
-        {
-            label: 'Equity',
-            options: [
-                { value: 'equity', label: 'Equity' },
-                { value: 'equity_unaffected', label: 'Current Year Earnings' },
-            ],
-        },
-        {
-            label: 'Income',
-            options: [
-                { value: 'income', label: 'Income' },
-                { value: 'income_other', label: 'Other Income' },
-            ],
-        },
-        {
-            label: 'Expenses',
-            options: [
-                { value: 'expense', label: 'Expense' },
-                { value: 'expense_other', label: 'Other Expense' },
-                { value: 'expense_depreciation', label: 'Depreciation' },
-                { value: 'expense_direct_cost', label: 'Direct Cost' },
-            ],
-        },
-        {
-            label: 'Off Balance',
-            options: [
-                { value: 'off_balance', label: 'Off Balance' },
-            ],
-        },
-    ];
+    const odooInputClass = "w-full border border-gray-300 rounded-sm px-2 py-1 text-sm bg-white focus:outline-none focus:border-cyan-600 focus:ring-1 focus:ring-cyan-600";
+    const odooCheckboxClass = "h-4 w-4 rounded-sm border-gray-300 text-cyan-600 focus:ring-cyan-500 mt-1.5 cursor-pointer";
 
     return (
         <AuthenticatedLayout>
-            <Head title="Create Account" />
+            <Head title={isEditMode ? "Edit Account" : "Create Account"} />
 
-            <div className="max-w-6xl mx-auto p-6">
-                <div className="bg-white shadow rounded-lg border">
+            {/* Odoo Top Control Panel */}
+            <div className="bg-white border-b border-gray-200 py-3 px-4 sticky top-0 z-10 flex items-center justify-between shadow-sm">
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={submit}
+                        disabled={processing}
+                        className="px-3 py-1.5 text-sm font-medium rounded bg-purple-700 text-white hover:bg-purple-800 disabled:opacity-50 shadow-sm"
+                    >
+                        {processing ? "Saving..." : "Save"}
+                    </button>
 
-                    {/* Header */}
-                    <div className="border-b px-6 py-4">
-                        <h1 className="text-2xl font-bold">
-                            Create Account
-                        </h1>
-                    </div>
+                    <button
+                        type="button"
+                        onClick={() => window.history.back()}
+                        className="px-3 py-1.5 text-sm font-medium rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 shadow-sm"
+                    >
+                        Discard
+                    </button>
+                </div>
+                
+                <div className="text-sm text-gray-500 font-medium">
+                    Accounts / <span className="text-gray-800 font-semibold">{data.code || "New"}</span>
+                </div>
+            </div>
 
-                    <form onSubmit={submit} className="p-6 space-y-6">
-
-                        {/* CODE */}
-                        <div>
-                            <label className="block mb-1 font-medium">
-                                Account Code
-                            </label>
-
-                            <input
-                                type="text"
-                                value={data.code}
-                                onChange={(e) =>
-                                    setData('code', e.target.value)
-                                }
-                                className="w-full border rounded px-3 py-2"
-                            />
-
-                            {errors.code && (
-                                <p className="text-red-500 text-sm">
-                                    {errors.code}
-                                </p>
+            {/* Odoo Form View Container */}
+            <div className="bg-gray-100 min-h-[calc(100vh-60px)] p-4 md:p-6">
+                <div className="max-w-6xl mx-auto">
+                    
+                    <form onSubmit={submit}>
+                        {/* Odoo Form Sheet Target */}
+                        <div className="bg-white border border-gray-300 rounded-sm shadow-sm min-h-[500px] relative">
+                            
+                            {/* 1. Odoo Stat Buttons Area (oe_button_box) - Only show in edit mode */}
+                            {isEditMode && (
+                                <div className="flex justify-end border-b border-gray-200 divide-x divide-gray-200 bg-gray-50/50 rounded-t-sm overflow-hidden">
+                                    <SmartButton
+                                        title="Journal Items"
+                                        count={152}
+                                        icon={<Receipt size={18} className="text-gray-500" />}
+                                        onClick={() => console.log("Journal")}
+                                    />
+                                    <SmartButton
+                                        title="Invoices"
+                                        count={12}
+                                        icon={<FileText size={18} className="text-gray-500" />}
+                                        onClick={() => console.log("Invoices")}
+                                    />
+                                    <SmartButton
+                                        title="Payments"
+                                        count={8}
+                                        icon={<CreditCard size={18} className="text-gray-500" />}
+                                        onClick={() => console.log("Payments")}
+                                    />
+                                    <SmartButton
+                                        title="Partners"
+                                        count={4}
+                                        icon={<Users size={18} className="text-gray-500" />}
+                                        onClick={() => console.log("Partners")}
+                                    />
+                                </div>
                             )}
-                        </div>
 
-                        {/* NAME */}
-                        <div>
-                            <label className="block mb-1 font-medium">
-                                Account Name
-                            </label>
+                            {/* Form Content Wrapper (Padding diberikan di sini agar memisahkan box_button) */}
+                            <div className="p-6 md:p-8">
 
-                            <input
-                                type="text"
-                                value={data.name}
-                                onChange={(e) =>
-                                    setData('name', e.target.value)
-                                }
-                                className="w-full border rounded px-3 py-2"
-                            />
+                                {/* 2. Odoo Header Title Group */}
+                                <div className="mb-6 pb-4 border-b border-gray-100">
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">
+                                        Account Title
+                                    </label>
+                                    <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                                        <span className="text-purple-700">{data.code || "New"}</span>
+                                        {data.name && <span className="text-gray-400 font-light">/</span>}
+                                        <span className="text-gray-700">{data.name}</span>
+                                    </h1>
+                                </div>
 
-                            {errors.name && (
-                                <p className="text-red-500 text-sm">
-                                    {errors.name}
-                                </p>
-                            )}
-                        </div>
+                                {/* 3. Odoo Grid System */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-1">
+                                    
+                                    {/* LEFT COLUMN */}
+                                    <div className="space-y-1">
+                                        <FormField label="Account Code" error={errors.code}>
+                                            <input
+                                                type="text"
+                                                value={data.code}
+                                                onChange={(e) => setData("code", e.target.value)}
+                                                className={odooInputClass}
+                                                placeholder="e.g. 101000"
+                                            />
+                                        </FormField>
 
-                        {/* ACCOUNT TYPE (FIXED SELECT ISSUE) */}
-                        <div>
-                            <label className="block mb-1 font-medium">
-                                Account Type
-                            </label>
+                                        <FormField label="Account Name" error={errors.name}>
+                                            <input
+                                                type="text"
+                                                value={data.name}
+                                                onChange={(e) => setData("name", e.target.value)}
+                                                className={odooInputClass}
+                                                placeholder="e.g. Current Assets"
+                                            />
+                                        </FormField>
 
-                            <select
-                                name="account_type"
-                                value={data.account_type || ''}
-                                onChange={(e) =>
-                                    setData('account_type', e.target.value)
-                                }
-                                className="w-full border rounded px-3 py-2"
-                            >
-                                <option value="">
-                                    Select Account Type
-                                </option>
-
-                                {accountTypeGroups.map((group) => (
-                                    <optgroup
-                                        key={group.label}
-                                        label={group.label}
-                                    >
-                                        {group.options.map((opt) => (
-                                            <option
-                                                key={opt.value}
-                                                value={opt.value}
+                                        <FormField label="Account Type" error={errors.account_type}>
+                                            <select
+                                                value={data.account_type}
+                                                onChange={(e) => setData("account_type", e.target.value)}
+                                                className={odooInputClass}
                                             >
-                                                {opt.label}
-                                            </option>
+                                                <option value="">Select Account Type...</option>
+                                                <option value="asset_cash">Cash</option>
+                                                <option value="asset_receivable">Receivable</option>
+                                                <option value="asset_current">Current Asset</option>
+                                                <option value="asset_non_current">Non Current Asset</option>
+                                                <option value="liability_payable">Payable</option>
+                                                <option value="liability_credit_card">Credit Card</option>
+                                                <option value="equity">Equity</option>
+                                                <option value="income">Income</option>
+                                                <option value="expense">Expense</option>
+                                                <option value="off_balance">Off Balance</option>
+                                            </select>
+                                        </FormField>
+                                    </div>
+
+                                    {/* RIGHT COLUMN */}
+                                    <div className="space-y-1">
+                                        <FormField label="Parent Account">
+                                            <select
+                                                value={data.parent_id}
+                                                onChange={(e) => setData("parent_id", e.target.value)}
+                                                className={odooInputClass}
+                                            >
+                                                <option value="">None</option>
+                                                {parentAccounts.map((acc) => (
+                                                    <option key={acc.id} value={acc.id}>
+                                                        {acc.code} - {acc.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </FormField>
+
+                                        <FormField label="Currency">
+                                            <input
+                                                type="text"
+                                                value={data.currency_code}
+                                                onChange={(e) => setData("currency_code", e.target.value)}
+                                                className={odooInputClass}
+                                            />
+                                        </FormField>
+
+                                        <FormField label="Allow Reconcile">
+                                            <input
+                                                type="checkbox"
+                                                checked={data.reconcile}
+                                                onChange={(e) => setData("reconcile", e.target.checked)}
+                                                className={odooCheckboxClass}
+                                            />
+                                        </FormField>
+
+                                        <FormField label="Active">
+                                            <input
+                                                type="checkbox"
+                                                checked={data.is_active}
+                                                onChange={(e) => setData("is_active", e.target.checked)}
+                                                className={odooCheckboxClass}
+                                            />
+                                        </FormField>
+                                    </div>
+
+                                </div>
+
+                                {/* 4. Odoo Notebook / Tabbed Section */}
+                                <div className="mt-8">
+                                    <div className="border-b border-gray-200 flex gap-4">
+                                        {[
+                                            { key: "general", label: "General Settings" },
+                                            { key: "accounting", label: "Accounting" },
+                                            { key: "notes", label: "Internal Notes" },
+                                        ].map((tab) => (
+                                            <button
+                                                key={tab.key}
+                                                type="button"
+                                                onClick={() => setActiveTab(tab.key)}
+                                                className={`px-3 py-2 -mb-px text-sm font-semibold transition border-b-2 ${
+                                                    activeTab === tab.key
+                                                        ? "border-purple-700 text-purple-700 font-bold"
+                                                        : "border-transparent text-gray-500 hover:text-gray-800"
+                                                }`}
+                                            >
+                                                {tab.label}
+                                            </button>
                                         ))}
-                                    </optgroup>
-                                ))}
-                            </select>
+                                    </div>
 
-                            {errors.account_type && (
-                                <p className="text-red-500 text-sm">
-                                    {errors.account_type}
-                                </p>
-                            )}
+                                    {/* TAB CONTENT */}
+                                    <div className="bg-white py-4 text-sm text-gray-700">
+                                        {activeTab === "general" && (
+                                            <div className="text-gray-500 italic">
+                                                Configure basic parameters for this account ledger.
+                                            </div>
+                                        )}
+
+                                        {activeTab === "accounting" && (
+                                            <div className="text-gray-500 italic">
+                                                Define localized accounting settings and tax mappings.
+                                            </div>
+                                        )}
+
+                                        {activeTab === "notes" && (
+                                            <div>
+                                                <textarea
+                                                    rows={4}
+                                                    value={data.notes}
+                                                    onChange={(e) => setData("notes", e.target.value)}
+                                                    placeholder="Write internal notes here..."
+                                                    className="w-full border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-purple-700"
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                            </div> {/* End of Form Content Wrapper */}
                         </div>
-
-                        {/* PARENT ACCOUNT */}
-                        <div>
-                            <label className="block mb-1 font-medium">
-                                Parent Account
-                            </label>
-
-                            <select
-                                value={data.parent_id || ''}
-                                onChange={(e) =>
-                                    setData('parent_id', e.target.value)
-                                }
-                                className="w-full border rounded px-3 py-2"
-                            >
-                                <option value="">None</option>
-
-                                {parentAccounts.map((acc) => (
-                                    <option
-                                        key={acc.id}
-                                        value={acc.id}
-                                    >
-                                        {acc.code} - {acc.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        {/* CURRENCY */}
-                        <div>
-                            <label className="block mb-1 font-medium">
-                                Currency
-                            </label>
-
-                            <input
-                                type="text"
-                                value={data.currency_code}
-                                onChange={(e) =>
-                                    setData('currency_code', e.target.value)
-                                }
-                                className="w-full border rounded px-3 py-2"
-                            />
-                        </div>
-
-                        {/* CHECKBOXES */}
-                        <div className="space-y-2">
-                            <label className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    checked={data.reconcile}
-                                    onChange={(e) =>
-                                        setData('reconcile', e.target.checked)
-                                    }
-                                />
-                                Allow Reconciliation
-                            </label>
-
-                            <label className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    checked={data.is_active}
-                                    onChange={(e) =>
-                                        setData('is_active', e.target.checked)
-                                    }
-                                />
-                                Active
-                            </label>
-                        </div>
-
-                        {/* NOTES */}
-                        <div>
-                            <label className="block mb-1 font-medium">
-                                Notes
-                            </label>
-
-                            <textarea
-                                rows={4}
-                                value={data.notes}
-                                onChange={(e) =>
-                                    setData('notes', e.target.value)
-                                }
-                                className="w-full border rounded px-3 py-2"
-                            />
-                        </div>
-
-                        {/* BUTTONS */}
-                        <div className="flex justify-end gap-3">
-                            <button
-                                type="button"
-                                onClick={() => window.history.back()}
-                                className="px-4 py-2 bg-gray-500 text-white rounded"
-                            >
-                                Cancel
-                            </button>
-
-                            <button
-                                type="submit"
-                                disabled={processing}
-                                className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
-                            >
-                                {processing ? 'Saving...' : 'Save Account'}
-                            </button>
-                        </div>
-
                     </form>
                 </div>
             </div>
